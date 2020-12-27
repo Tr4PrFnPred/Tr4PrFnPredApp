@@ -1,0 +1,7 @@
+aiofiles==0.6.0
+fastapi==0.62.0
+uvicorn==0.12.3
+Jinja2==2.11.2
+tensorflow==2.4.0
+torch==1.7.1
+git+git://github.com/Tr4PrFnPred/Tr4PrFnPredLib.git
