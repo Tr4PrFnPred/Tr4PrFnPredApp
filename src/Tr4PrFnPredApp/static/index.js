@@ -59,7 +59,7 @@ function submitSequence(e) {
 
         console.info(JSON.stringify(body));
 
-        fetch("http://localhost:5000/predict/", {
+        fetch("/predict", {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
@@ -69,7 +69,8 @@ function submitSequence(e) {
         }).then(function(response) {
             return response.json();
         }).then(function(data) {
-            console.log(data);
+
+            // show the result block
             let results = document.getElementById('results');
             results.style.display = "block";
             let sequencerow = document.getElementById('sequence-row');
@@ -78,6 +79,14 @@ function submitSequence(e) {
             resultrow.innerHTML = data.data.terms;
         })
     }
+}
+
+function searchResult(e) {
+    let jobIdInput = document.getElementById("jobid");
+    let jobId = jobIdInput.value;
+
+    // redirect page to the result page
+    window.location.href = `/result/page/${jobId}`;
 }
 
 function fillExample() {
