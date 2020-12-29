@@ -4,3 +4,8 @@
     margin: 0 auto;
     background-color: rgb(255, 255, 255);
 }
+
+#title {
+    width: 900px;
+    margin: 0 auto;
+}
