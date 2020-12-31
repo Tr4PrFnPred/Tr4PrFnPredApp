@@ -21,3 +21,7 @@ class PredictResponse(BaseModel):
     terms: List[Union[str, float]]
 
 
+class PredictJobResponse(BaseModel):
+    model: Optional[str]
+    jobId: int
+    status: str = "RUNNING"
