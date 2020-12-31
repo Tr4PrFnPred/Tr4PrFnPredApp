@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter
-from schema.predict import PostPredict, PredictResponse
+from ..schema.predict import PostPredict, PredictResponse
 
 from Tr4PrFnPredLib.Pipeline import pipeline
 

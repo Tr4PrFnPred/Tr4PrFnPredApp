@@ -1,3 +1,4 @@
+print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(__file__,__name__,str(__package__)))
 # python modules
 import logging
 
@@ -10,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import predict, model, result
+from .routers import predict, model, result
 
 app = FastAPI(
     title="Transformers for Protein Function Prediction",
