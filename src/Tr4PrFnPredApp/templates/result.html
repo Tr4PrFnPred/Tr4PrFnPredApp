@@ -5,31 +5,61 @@
     <title>Transformers for Protein Function Prediction</title>
     <link rel='stylesheet' type='text/css' media='screen' href="{{ url_for('static', path='/result.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <script src="{{ url_for('static', path='/result.js') }}" ></script>
+    <script src="{{ url_for('static', path='/result.js') }}"></script>
 </head>
 <body>
     <div id="header">
         <div id="title">
             <h1>Transformers for Protein Function Prediction</h1>
-            <h2>Job Id: {{ id }}</h2>
+            <h2>Job Id: {{ job_id }}</h2>
             <button id="backButton" class="btn btn-primary">Back</button>
         </div>
     </div>
-    <div id="results" style="display: none">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">Sequence</th>
-                <th scope="col">Result</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td id="sequence-row"></td>
-                <td id="result-row"></td>
-            </tr>
-            </tbody>
-        </table>
+    <div id="content" style="display: block">
+        <div id="content-wrapper">
+            <div id="waiting" style="display: block">
+                <h4>Status for Job ID: {{ job_id }} is:</h4>
+                <h3>Pending</h3>
+                <p>The page will automatically update when the results are ready</p>
+            </div>
+            <div id="results" style="display: none">
+                <input type="text" id="filter" placeholder="Filter table..." title="Filter input">
+                <table id="resultTable" class="table table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Entry</th>
+                            <th scope="col" style="width:50%">Sequence</th>
+                            <th scope="col">GO terms</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Q5QJU0</td>
+                            <td class="sequenceCol">MGAPHWWDQLQAGSSEVDWCEDNYTIVPAIAEFYNTISNVLFFILPPICMCLFRQYATCFNSGIYLIWTLLVVVGIGSVYFHATLSFLGQMLDELAVLWVLMCALAMWFPRRYLPKIFRN DRGRFKVVVSVLSAVTTCLAFVKPAINNISLMTLGVPCTALLIAELKRCDNMRVFKLGLF SGLWWTLALFCWISDRAFCELLSSFNFPYLHCMWHILICLAAYLGCVCFAYFDAASEIPE QGPVIKFWPNEKWAFIGVPYVSLLCANKKSSVKIT</td>
+                            <td><a href="">GO:0003674</a></td>
+                            <td>0.999</td>
+                            <td>molecular_function</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="sequenceCol"></td>
+                            <td><a href="">GO:0003824</a></td>
+                            <td>0.872</td>
+                            <td>catalytic activity</td>
+                        </tr>
+                        <tr>
+                            <td>ABCDEF</td>
+                            <td class="sequenceCol">MGAPHWWDQLQAGSSEVDWCEDNYTIVPAIAEFYNTISNVLFFILPPICMCLFRQYATCFNSGIYLIWTLLVVVGIGSVYFHATLSFLGQMLDELAVLWVLMCALAMWFPRRYLPKIFRNDRGRFKVVVSVLSAVTTCLAFVKPAINNISLMTLGVPCTALLIAELKRCDNMRVFKLGLF SGLWWTLALFCWISDRAFCELLSSFNFPYLHCMWHILICLAAYLGCVCFAYFDAASEIPEQGPVIKFWPNEKWAFIGVPYVSLLCANKKSSVKIT</td>
+                            <td><a href="">GO:0003674</a></td>
+                            <td>0.999</td>
+                            <td>dihydroceramidase activity</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -1,3 +1,6 @@
+html {
+    background-color: rgb(240, 240, 240);
+}
 
 #header {
     padding-top: 30px;
@@ -8,4 +11,31 @@
 #title {
     width: 900px;
     margin: 0 auto;
+}
+
+#content {
+    background-color: rgb(240, 240, 240);
+    overflow: hidden;
+    margin-top: 12px;
+    padding-top: 12px;
+}
+
+#content-wrapper {
+    width: 900px;
+    margin: 0 auto;
+}
+
+#filter {
+    background-image: url("/static/search.svg");
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    width: 100%;
+    font-size: 16px;
+    padding: 8px 20px 8px 40px;
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+
+.sequenceCol {
+    word-break: break-all;
 }

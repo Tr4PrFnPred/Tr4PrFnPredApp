@@ -18,12 +18,12 @@ router = APIRouter(
 )
 
 
-@router.get("/page/{id}")
+@router.get("/page/{job_id}")
 async def render_result_page(request: Request, job_id: int):
-    return templates.TemplateResponse("result.html", {"request": request, "id": job_id})
+    return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id})
 
 
-@router.get("/{id}")
+@router.get("/{job_id}")
 async def get_result(job_id: int):
 
     status = await check_job_status(job_id)
