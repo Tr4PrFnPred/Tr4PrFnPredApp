@@ -4,7 +4,7 @@
 """
 from typing import Optional, List, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class PredictSchema(BaseModel):
@@ -23,5 +23,6 @@ class PredictResponse(BaseModel):
 
 class PredictJobResponse(BaseModel):
     model: Optional[str]
-    jobId: int
-    status: str = "RUNNING"
+    job_id: int
+    status: str = "PENDING"
+    terms: Optional[List[Union[str, float]]]
