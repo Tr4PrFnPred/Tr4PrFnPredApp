@@ -35,27 +35,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Q5QJU0</td>
-                            <td class="sequenceCol">MGAPHWWDQLQAGSSEVDWCEDNYTIVPAIAEFYNTISNVLFFILPPICMCLFRQYATCFNSGIYLIWTLLVVVGIGSVYFHATLSFLGQMLDELAVLWVLMCALAMWFPRRYLPKIFRN DRGRFKVVVSVLSAVTTCLAFVKPAINNISLMTLGVPCTALLIAELKRCDNMRVFKLGLF SGLWWTLALFCWISDRAFCELLSSFNFPYLHCMWHILICLAAYLGCVCFAYFDAASEIPE QGPVIKFWPNEKWAFIGVPYVSLLCANKKSSVKIT</td>
-                            <td><a href="">GO:0003674</a></td>
-                            <td>0.999</td>
-                            <td>molecular_function</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="sequenceCol"></td>
-                            <td><a href="">GO:0003824</a></td>
-                            <td>0.872</td>
-                            <td>catalytic activity</td>
-                        </tr>
-                        <tr>
-                            <td>ABCDEF</td>
-                            <td class="sequenceCol">MGAPHWWDQLQAGSSEVDWCEDNYTIVPAIAEFYNTISNVLFFILPPICMCLFRQYATCFNSGIYLIWTLLVVVGIGSVYFHATLSFLGQMLDELAVLWVLMCALAMWFPRRYLPKIFRNDRGRFKVVVSVLSAVTTCLAFVKPAINNISLMTLGVPCTALLIAELKRCDNMRVFKLGLF SGLWWTLALFCWISDRAFCELLSSFNFPYLHCMWHILICLAAYLGCVCFAYFDAASEIPEQGPVIKFWPNEKWAFIGVPYVSLLCANKKSSVKIT</td>
-                            <td><a href="">GO:0003674</a></td>
-                            <td>0.999</td>
-                            <td>dihydroceramidase activity</td>
-                        </tr>
+                        {% for entry in results %}
+                            <tr entry="{{entry}}">
+                                <td>{{ entry }}</td>
+                                <td>{{ results[entry][0].sequence }}</td>
+                            </tr>
+                            {% for term in results[entry] %}
+                            <tr entry="{{entry}}">
+                                <td></td>
+                                <td></td>
+                                <!-- url for more information on GO term -->
+                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term.term}}" target="_blank" rel="noopener">{{ term.term }}</a></td>
+                                <td>{{ term.score }}</td>
+                                <td>{{ term.function_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
