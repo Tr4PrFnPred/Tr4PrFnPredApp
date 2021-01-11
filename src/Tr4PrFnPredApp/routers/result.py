@@ -4,8 +4,10 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 
 from Tr4PrFnPredLib.jobs.submit import check_job_status
+from Tr4PrFnPredLib.jobs.fetch import fetch_results
 
 from ..schema.predict import PredictJobResponse
+from ..common.constants import STATE_COMPLETE
 
 templates = Jinja2Templates(directory="templates")
 
@@ -37,33 +39,43 @@ async def _check_job_status_mock(job_id) -> str:
 @router.get("/page/{job_id}")
 async def render_result_page(request: Request, job_id: int):
 
-    # FIXME: remove after testing
-    results = {
-        "Q5QJU0": [
-            {
-                "sequence": "ABCDEFGHIJKLMNOP",
-                "term": "GO:0003674",
-                "score": "0.999",
-                "function_name": "molecular_function"
-            },
-            {
-                "sequence": "QRSTUVWXYZ",
-                "term": "GO:0003824",
-                "score": "0.872",
-                "function_name": "catalytic activity"
-            },
-        ],
-        "QABCDEF": [
-            {
-                "sequence": "QRSTUVWXYZ",
-                "term": "GO:0003824",
-                "score": "0.872",
-                "function_name": "dihydroceramidase activity"
-            },
-        ]
-    }
+    # TODO: consider caching statuses
+    status = await _check_job_status_mock(job_id)
 
-    return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": results})
+    if status != STATE_COMPLETE:
+        return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "isComplete": False})
+
+    entries, sequences, terms = await fetch_results(job_id)
+
+    # FIXME: remove after testing
+    # results = {
+    #     "Q5QJU0": [
+    #         {
+    #             "sequence": "ABCDEFGHIJKLMNOP",
+    #             "term": "GO:0003674",
+    #             "score": "0.999",
+    #             "function_name": "molecular_function"
+    #         },
+    #         {
+    #             "sequence": "QRSTUVWXYZ",
+    #             "term": "GO:0003824",
+    #             "score": "0.872",
+    #             "function_name": "catalytic activity"
+    #         },
+    #     ],
+    #     "QABCDEF": [
+    #         {
+    #             "sequence": "QRSTUVWXYZ",
+    #             "term": "GO:0003824",
+    #             "score": "0.872",
+    #             "function_name": "dihydroceramidase activity"
+    #         },
+    #     ]
+    # }
+
+    # return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": results})
+    return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "entries": entries,
+                                                      "sequences": sequences, "terms": terms})
 
 
 @router.get("/{job_id}")

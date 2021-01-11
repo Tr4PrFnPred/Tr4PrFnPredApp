@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 class PredictSchema(BaseModel):
     model: str
-    sequences: List[Union[str, float]] = []
+    sequences: Union[str, List[Union[str, float]]]
 
 
 class PostPredict(BaseModel):

@@ -17,12 +17,14 @@
     </div>
     <div id="content" style="display: block">
         <div id="content-wrapper">
+            {% if isComplete is False %}
             <div id="waiting" style="display: block">
                 <h4>Status for Job ID: {{ job_id }} is:</h4>
                 <h3 id="job-status">PENDING</h3>
                 <p>The page will automatically update when the results are ready</p>
             </div>
-            <div id="results" style="display: none">
+            {% else %}
+            <div id="results" style="display: block">
                 <input type="text" id="filter" placeholder="Filter table..." title="Filter input">
                 <table id="resultTable" class="table table-hover table-bordered">
                     <thead class="thead-light">

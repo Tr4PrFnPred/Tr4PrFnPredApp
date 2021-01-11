@@ -39,7 +39,8 @@ function createPollInterval(job_id, timeout) {
             if (status === "COMPLETED") {
                 clearInterval(pollInterval);
                 document.getElementById("waiting").style.display = "none";
-                document.getElementById("results").style.display = "block";
+                // document.getElementById("results").style.display = "block";
+                window.location.reload();
             } else if (status === "ERROR") {
                 clearInterval(pollInterval);
             } else {

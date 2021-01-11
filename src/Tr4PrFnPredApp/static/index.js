@@ -70,13 +70,8 @@ function submitSequence(e) {
             return response.json();
         }).then(function(data) {
 
-            // show the result block
-            let results = document.getElementById('results');
-            results.style.display = "block";
-            let sequencerow = document.getElementById('sequence-row');
-            let resultrow = document.getElementById('result-row');
-            sequencerow.innerHTML = sequences;
-            resultrow.innerHTML = data.data.terms;
+            let jobId = data.data.jobId;
+            window.location.href = `/result/page/${jobId}`
         })
     }
 }
