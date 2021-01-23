@@ -42,40 +42,66 @@ async def render_result_page(request: Request, job_id: int):
     # TODO: consider caching statuses
     status = await _check_job_status_mock(job_id)
 
-    if status != STATE_COMPLETE:
+    if status == STATE_COMPLETE:
+
+        # entries, sequences, terms = await fetch_results(job_id)
+
+        # FIXME: remove after testing
+        results = {
+            "Q5QJU0": [
+                {
+                    "sequence": "ABCDEFGHIJKLMNOP",
+                    "term": "GO:0003674",
+                    "score": "0.999",
+                    "function_name": "molecular_function"
+                },
+                {
+                    "sequence": "QRSTUVWXYZ",
+                    "term": "GO:0003824",
+                    "score": "0.872",
+                    "function_name": "catalytic activity"
+                },
+            ],
+            "QABCDEF": [
+                {
+                    "sequence": "QRSTUVWXYZ",
+                    "term": "GO:0003824",
+                    "score": "0.872",
+                    "function_name": "dihydroceramidase activity"
+                },
+            ],
+            "QABCDED": [
+                {
+                    "sequence": "QRSTUVWXYZ",
+                    "term": "GO:0003824",
+                    "score": "0.872",
+                    "function_name": "dihydroceramidase activity"
+                },
+            ],
+            "QABCDEA": [
+                {
+                    "sequence": "QRSTUVWXYZ",
+                    "term": "GO:0003824",
+                    "score": "0.872",
+                    "function_name": "dihydroceramidase activity"
+                },
+            ],
+            "QABCDEC": [
+                {
+                    "sequence": "QRSTUVWXYZ",
+                    "term": "GO:0003824",
+                    "score": "0.872",
+                    "function_name": "dihydroceramidase activity"
+                },
+            ]
+        }
+
+        return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": results, "isComplete": True})
+        # return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "entries": entries,
+        #                                                   "sequences": sequences, "terms": terms})
+
+    else:
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "isComplete": False})
-
-    entries, sequences, terms = await fetch_results(job_id)
-
-    # FIXME: remove after testing
-    # results = {
-    #     "Q5QJU0": [
-    #         {
-    #             "sequence": "ABCDEFGHIJKLMNOP",
-    #             "term": "GO:0003674",
-    #             "score": "0.999",
-    #             "function_name": "molecular_function"
-    #         },
-    #         {
-    #             "sequence": "QRSTUVWXYZ",
-    #             "term": "GO:0003824",
-    #             "score": "0.872",
-    #             "function_name": "catalytic activity"
-    #         },
-    #     ],
-    #     "QABCDEF": [
-    #         {
-    #             "sequence": "QRSTUVWXYZ",
-    #             "term": "GO:0003824",
-    #             "score": "0.872",
-    #             "function_name": "dihydroceramidase activity"
-    #         },
-    #     ]
-    # }
-
-    # return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": results})
-    return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "entries": entries,
-                                                      "sequences": sequences, "terms": terms})
 
 
 @router.get("/{job_id}")

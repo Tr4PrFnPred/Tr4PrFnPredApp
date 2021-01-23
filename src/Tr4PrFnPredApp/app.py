@@ -1,8 +1,12 @@
 # python modules
 import logging
+import sys
 
 # used for starting the application
 import uvicorn
+
+# library for asynchronous operations
+import asyncio
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -39,6 +43,11 @@ templates = Jinja2Templates(directory="templates/")
 
 # loggers
 logging.basicConfig(level=logging.DEBUG)
+
+# set the event loop depending on platform
+# https://stackoverflow.com/questions/44633458/why-am-i-getting-notimplementederror-with-async-and-await-on-windows
+if 'win32' in sys.platform:
+    asyncio.set_event_loop(asyncio.ProactorEventLoop())
 
 # home page
 @app.get("/", response_class=HTMLResponse)

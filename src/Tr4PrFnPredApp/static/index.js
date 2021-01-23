@@ -27,10 +27,10 @@ function submitSequence(e) {
 
     let input = document.getElementById("sequences-input");
     let model_select = document.getElementById("model-select");
-    let sequences = input.value;
+    let sequences_input = input.value;
     let model = model_select.value;
 
-    if (!sequences) {
+    if (!sequences_input) {
 
         // set invalid text
         document.getElementById("sequences-invalid").style.display = "block";
@@ -42,18 +42,23 @@ function submitSequence(e) {
         // disappear when successful
         document.getElementById("sequences-invalid").style.display = "none";
 
-        // set invalid textarea form
+        // set valid textarea form
         input.className = "form-control";
 
-        // remove all white space
-        sequences = sequences.replace(/\s/g, '');
+        let sequences;
         //TODO: REMOVE NEXT LINE IN THE FUTURE - THIS IS JUST FOR TESTING
-        let seq_number = sequences.split(",").map(value => parseInt(value));
+        if (model === "Test") {
+            // remove all white space
+            sequences_input = sequences_input.replace(/\s/g, '');
+            sequences = sequences_input.split(",").map(value => parseInt(value));
+        } else {
+            sequences = sequences_input;
+        }
 
         let body = {
                 "data": {
                     "model": model,
-                    "sequences": seq_number
+                    "sequences": sequences
                 }
             };
 
