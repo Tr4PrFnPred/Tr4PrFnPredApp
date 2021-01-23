@@ -38,8 +38,8 @@ app.include_router(model.router)
 app.include_router(result.router)
 
 # mount static and template files
-app.mount("/static", StaticFiles(directory="static/"), name="static")
-templates = Jinja2Templates(directory="templates/")
+app.mount("/static", StaticFiles(directory="src/Tr4PrFnPredApp/static/"), name="static")
+templates = Jinja2Templates(directory="src/Tr4PrFnPredApp/templates/")
 
 # loggers
 logging.basicConfig(level=logging.DEBUG)
