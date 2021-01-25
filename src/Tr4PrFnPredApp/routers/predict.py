@@ -47,7 +47,7 @@ def _parse_fasta_input(fasta: str) -> dict:
     return entry_dict
 
 
-@router.post("/", response_model=PredictResponse)
+@router.post("/", response_model=PredictJobResponse)
 async def predict_protein_function(json: PostPredict):
 
     model_type, sequences = _parse_post_predict(json)
@@ -60,7 +60,7 @@ async def predict_protein_function(json: PostPredict):
     job_id = await submit_and_get_job_id(model_type, entry_dict)
     # job_id = await submit_and_get_job_id(model_type, sequences, "job_submission.sh", "~/PyCharmProjects/Tr4PrFnPredApp/")
 
-    res = PredictJobResponse(model=model_type, job_id=job_id)
+    res = PredictJobResponse(model=model_type, job_id=job_id, terms=[])
 
     return res
 

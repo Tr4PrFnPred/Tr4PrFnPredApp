@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
@@ -27,7 +28,7 @@ async def _check_job_status_mock(job_id) -> str:
     from asyncio import sleep
 
     status = randint(0, 3)
-    await sleep(job_id)
+    await sleep(10)
     if status == 0:
         return "COMPLETED"
     elif status == 1:
@@ -37,7 +38,7 @@ async def _check_job_status_mock(job_id) -> str:
 
 
 @router.get("/page/{job_id}")
-async def render_result_page(request: Request, job_id: int):
+async def render_result_page(request: Request, job_id: Union[int, str]):
 
     # TODO: consider caching statuses
     status = await _check_job_status_mock(job_id)
@@ -105,7 +106,7 @@ async def render_result_page(request: Request, job_id: int):
 
 
 @router.get("/{job_id}")
-async def get_result(job_id: int):
+async def get_result(job_id: Union[str, int]):
 
     # status = await check_job_status(job_id)
     # FIXME: Remove after testing

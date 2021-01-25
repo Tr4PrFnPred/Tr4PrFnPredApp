@@ -75,7 +75,7 @@ function submitSequence(e) {
             return response.json();
         }).then(function(data) {
 
-            let jobId = data.data.jobId;
+            let jobId = data.job_id;
             window.location.href = `/result/page/${jobId}`
         })
     }

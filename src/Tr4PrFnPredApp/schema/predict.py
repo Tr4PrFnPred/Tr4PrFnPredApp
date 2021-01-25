@@ -23,6 +23,6 @@ class PredictResponse(BaseModel):
 
 class PredictJobResponse(BaseModel):
     model: Optional[str]
-    job_id: int
+    job_id: Union[int, str]
     status: str = "PENDING"
     terms: Optional[List[Union[str, float]]]
