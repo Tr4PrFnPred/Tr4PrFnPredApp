@@ -47,7 +47,8 @@ logging.basicConfig(level=logging.DEBUG)
 # set the event loop depending on platform
 # https://stackoverflow.com/questions/44633458/why-am-i-getting-notimplementederror-with-async-and-await-on-windows
 if 'win32' in sys.platform:
-    asyncio.set_event_loop(asyncio.ProactorEventLoop())
+    # asyncio.set_event_loop(asyncio.ProactorEventLoop())
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 # home page
 @app.get("/", response_class=HTMLResponse)

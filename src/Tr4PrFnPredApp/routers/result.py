@@ -10,7 +10,7 @@ from Tr4PrFnPredLib.jobs.fetch import fetch_results
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="src/Tr4PrFnPredApp/templates/")
 
 router = APIRouter(
     prefix="/result",
@@ -35,6 +35,7 @@ async def _check_job_status_mock(job_id) -> str:
         return "PENDING"
     else:
         return "RUNNING"
+    # return "COMPLETED"
 
 
 @router.get("/page/{job_id}")
@@ -44,60 +45,12 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
     status = await _check_job_status_mock(job_id)
 
     if status == STATE_COMPLETE:
-
-        # entries, sequences, terms = await fetch_results(job_id)
-
         # FIXME: remove after testing
-        results = {
-            "Q5QJU0": [
-                {
-                    "sequence": "ABCDEFGHIJKLMNOP",
-                    "term": "GO:0003674",
-                    "score": "0.999",
-                    "function_name": "molecular_function"
-                },
-                {
-                    "sequence": "QRSTUVWXYZ",
-                    "term": "GO:0003824",
-                    "score": "0.872",
-                    "function_name": "catalytic activity"
-                },
-            ],
-            "QABCDEF": [
-                {
-                    "sequence": "QRSTUVWXYZ",
-                    "term": "GO:0003824",
-                    "score": "0.872",
-                    "function_name": "dihydroceramidase activity"
-                },
-            ],
-            "QABCDED": [
-                {
-                    "sequence": "QRSTUVWXYZ",
-                    "term": "GO:0003824",
-                    "score": "0.872",
-                    "function_name": "dihydroceramidase activity"
-                },
-            ],
-            "QABCDEA": [
-                {
-                    "sequence": "QRSTUVWXYZ",
-                    "term": "GO:0003824",
-                    "score": "0.872",
-                    "function_name": "dihydroceramidase activity"
-                },
-            ],
-            "QABCDEC": [
-                {
-                    "sequence": "QRSTUVWXYZ",
-                    "term": "GO:0003824",
-                    "score": "0.872",
-                    "function_name": "dihydroceramidase activity"
-                },
-            ]
-        }
+        entries = ["Q5QJU0", "QABCDEF", "QABCDED", "QABCDEA"]
+        sequences = ["ABCDEFGHIJKLMNOP", "QRSTUVWXYZ", "QRSTUVWXYZ", "QRSTUVWXYZ"]
+        terms = [{"GO:0003824": "0.999", "GO:0003674": "0.872"}, {"GO:0003824": "0.999"}, {"GO:0003824": 0.768}, {"GO:0003824": 0.896}]
 
-        return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": results, "isComplete": True})
+        return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "results": zip(entries, sequences, terms), "isComplete": True})
         # return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "entries": entries,
         #                                                   "sequences": sequences, "terms": terms})
 

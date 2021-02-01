@@ -34,19 +34,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for entry in results %}
+                        {% for entry, seq, terms in results %}
                             <tr entry="{{entry}}">
                                 <td>{{ entry }}</td>
-                                <td>{{ results[entry][0].sequence }}</td>
+                                <td>{{ seq }}</td>
                             </tr>
-                            {% for term in results[entry] %}
+                            {% for term, score in terms.items() %}
                             <tr entry="{{entry}}">
                                 <td></td>
                                 <td></td>
                                 <!-- url for more information on GO term -->
-                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term.term}}" target="_blank" rel="noopener">{{ term.term }}</a></td>
-                                <td>{{ term.score }}</td>
-                                <td>{{ term.function_name }}</td>
+                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term }}</a></td>
+                                <td>{{ score }}</td>
+                                <td>molecular_function</td>
                             </tr>
                             {% endfor %}
                         {% endfor %}
