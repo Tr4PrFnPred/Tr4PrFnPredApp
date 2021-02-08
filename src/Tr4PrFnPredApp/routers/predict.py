@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from ..schema.predict import PostPredict, PredictResponse, PredictJobResponse
 
-# from Tr4PrFnPredLib.Pipeline import pipeline
 from Tr4PrFnPredLib.jobs.submit import submit_and_get_job_id
+from fastapi import File, UploadFile, Form
 
 
 router = APIRouter(
@@ -36,6 +36,7 @@ def _parse_fasta_input(fasta: str) -> dict:
     for entry in entries:
         if entry == "":
             continue
+        entry = entry.replace("\r", "")
 
         entry_split_by_newline = entry.split("\n")
 
@@ -51,14 +52,23 @@ def _parse_fasta_input(fasta: str) -> dict:
 async def predict_protein_function(json: PostPredict):
 
     model_type, sequences = _parse_post_predict(json)
-    # prediction = await pipeline(model_type).predict(sequences)
-
-    # res = PredictResponse(model=model_type, terms=prediction)
 
     entry_dict = _parse_fasta_input(sequences)
 
     job_id = await submit_and_get_job_id(model_type, entry_dict)
-    # job_id = await submit_and_get_job_id(model_type, sequences, "job_submission.sh", "~/PyCharmProjects/Tr4PrFnPredApp/")
+
+    res = PredictJobResponse(model=model_type, job_id=job_id, terms=[])
+
+    return res
+
+
+@router.post("/file", response_model=PredictJobResponse)
+async def predict_protein_function_file(model_type: str = Form(...), file: UploadFile = File(...)):
+    content = await file.read()
+
+    entry_dict = _parse_fasta_input(content.decode("utf-8"))
+
+    job_id = await submit_and_get_job_id(model_type, entry_dict)
 
     res = PredictJobResponse(model=model_type, job_id=job_id, terms=[])
 

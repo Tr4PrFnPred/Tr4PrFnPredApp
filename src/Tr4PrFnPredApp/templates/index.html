@@ -30,14 +30,13 @@
         <div id="content">
             <div id="submit-wrapper" class="tab" style="display: block">
                 <div id="submit-page">
-                    <form>
+                    <form id="job-form" enctype="multipart/form-data" method="POST">
                         <div class="form-group">
                             <label for="model-select">Select a model:</label>
-                            <select id="model-select" class="form-control">
+                            <select id="model-select" class="form-control" name="model_type">
                                 <option>XBERT</option>
                                 <option>DeepGOPlus</option>
                                 <option>GOLabeler</option>
-                                <option>Test</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -46,6 +45,10 @@
                             <div id="sequences-invalid" class="invalid-feedback" style="display: none;">
                                 Must not be empty
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sequences-input-file">Or upload FASTA file</label>
+                            <input type="file" class="form-controlfile" name="file" id="sequences-input-file">
                         </div>
                         <div class="form-group">
                             <label for="emailInput">Email (optional)</label>

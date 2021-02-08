@@ -26,11 +26,12 @@ function switchTabs(e, tab) {
 function submitSequence(e) {
 
     let input = document.getElementById("sequences-input");
+    let file_input = document.getElementById("sequences-input-file");
     let model_select = document.getElementById("model-select");
     let sequences_input = input.value;
     let model = model_select.value;
 
-    if (!sequences_input) {
+    if (!sequences_input && file_input.files.length === 0) {
 
         // set invalid text
         document.getElementById("sequences-invalid").style.display = "block";
@@ -45,39 +46,50 @@ function submitSequence(e) {
         // set valid textarea form
         input.className = "form-control";
 
-        let sequences;
-        //TODO: REMOVE NEXT LINE IN THE FUTURE - THIS IS JUST FOR TESTING
-        if (model === "Test") {
-            // remove all white space
-            sequences_input = sequences_input.replace(/\s/g, '');
-            sequences = sequences_input.split(",").map(value => parseInt(value));
+        if (!sequences_input) {
+            let form = document.getElementById("job-form");
+            form.action = "/predict/file";
+            form.submit();
+
+            fetch("/predict/file", {
+                method: "post",
+                body: new FormData(form)
+            }).then((resp) => {
+                return resp.json();
+            }).then(function(data) {
+
+                let jobId = data.job_id;
+                window.location.href = `/result/page/${jobId}`
+            })
         } else {
-            sequences = sequences_input;
+
+            let sequences = sequences_input;
+
+
+            let body = {
+                    "data": {
+                        "model": model,
+                        "sequences": sequences
+                    }
+                };
+
+            console.info(JSON.stringify(body));
+
+            fetch("/predict", {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-cache',
+                body: JSON.stringify(body)
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
+
+                let jobId = data.job_id;
+                window.location.href = `/result/page/${jobId}`
+            })
         }
-
-        let body = {
-                "data": {
-                    "model": model,
-                    "sequences": sequences
-                }
-            };
-
-        console.info(JSON.stringify(body));
-
-        fetch("/predict", {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            cache: 'no-cache',
-            body: JSON.stringify(body)
-        }).then(function(response) {
-            return response.json();
-        }).then(function(data) {
-
-            let jobId = data.job_id;
-            window.location.href = `/result/page/${jobId}`
-        })
     }
 }
 
