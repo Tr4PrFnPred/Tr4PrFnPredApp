@@ -39,3 +39,7 @@ html {
 .sequenceCol {
     word-break: break-all;
 }
+
+#download-icon {
+    margin-bottom: 1em;
+}
