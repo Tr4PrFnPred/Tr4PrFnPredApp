@@ -10,6 +10,10 @@ from Tr4PrFnPredLib.jobs.fetch import fetch_results
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__file__)
+
 templates = Jinja2Templates(directory="src/Tr4PrFnPredApp/templates/")
 
 router = APIRouter(
@@ -42,9 +46,11 @@ async def _check_job_status_mock(job_id) -> str:
 async def render_result_page(request: Request, job_id: Union[int, str]):
 
     # TODO: consider caching statuses
-    status = await _check_job_status_mock(job_id)
+    status = await check_job_status(job_id)
 
-    if status == STATE_COMPLETE:
+    logger.info(f'Status {status}')
+
+    if status.upper() == STATE_COMPLETE:
         # FIXME: remove after testing
         entries = ["Q5QJU0", "QABCDEF", "QABCDED", "QABCDEA"]
         sequences = ["ABCDEFGHIJKLMNOP", "QRSTUVWXYZ", "QRSTUVWXYZ", "QRSTUVWXYZ"]

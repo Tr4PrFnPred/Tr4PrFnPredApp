@@ -17,7 +17,7 @@ router = APIRouter(
 def _parse_post_predict(json: PostPredict):
 
     data = json.data
-    return data.model, data.sequences
+    return data.model.lower(), data.sequences
 
 
 def _parse_fasta_input(fasta: str) -> dict:
