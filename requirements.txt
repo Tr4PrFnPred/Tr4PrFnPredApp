@@ -5,4 +5,5 @@ Jinja2==2.11.2
 tensorflow==2.4.0
 torch==1.7.1
 python-mutlipart==0.0.5
+redis==3.5.3
 git+git://github.com/Tr4PrFnPred/Tr4PrFnPredLib.git

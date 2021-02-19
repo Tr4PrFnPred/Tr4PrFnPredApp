@@ -31,7 +31,6 @@ function createPollInterval(job_id, timeout) {
 }
 document.addEventListener("DOMContentLoaded", function(event) {
 
-    console.log("Polling");
     // get the job id via the url
     // regex gets the last string following the last /
     let job_id = window.location.href.match(/[^\/]+$/);

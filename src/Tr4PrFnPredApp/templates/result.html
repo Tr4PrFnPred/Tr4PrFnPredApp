@@ -57,7 +57,7 @@
             {% else %}
                  <div id="waiting" style="display: block">
                     <h4>Status for Job ID: {{ job_id }} is:</h4>
-                    <h3 id="job-status">PENDING</h3>
+                    <h3 id="job-status">{{ status }}</h3>
                     <p>The page will automatically update when the results are ready</p>
                  </div>
             {% endif %}

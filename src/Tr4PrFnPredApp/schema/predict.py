@@ -2,7 +2,7 @@
     Schemas for /predict endpoint
 
 """
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Dict
 
 from pydantic import BaseModel
 
@@ -25,4 +25,4 @@ class PredictJobResponse(BaseModel):
     model: Optional[str]
     job_id: Union[int, str]
     status: str = "PENDING"
-    terms: Optional[List[Union[str, float]]]
+    result: Optional[Dict]
