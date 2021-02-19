@@ -9,7 +9,7 @@ html {
 }
 
 #title {
-    width: 900px;
+    width: 1000px;
     margin: 0 auto;
 }
 
@@ -21,8 +21,16 @@ html {
 }
 
 #content-wrapper {
-    width: 900px;
+    width: 1000px;
     margin: 0 auto;
+}
+
+#resultTable {
+    table-layout: fixed;
+}
+
+td {
+    word-break: break-word;
 }
 
 #filter {
