@@ -9,7 +9,7 @@ from Tr4PrFnPredLib.jobs.fetch import fetch_results
 from Tr4PrFnPredLib.utils.storage import cache_job_id
 
 from ..schema.predict import PredictJobResponse
-from ..common.constants import STATE_COMPLETE
+from ..common.constants import STATE_COMPLETE, STATE_ERROR
 from ..common.storage import get_job_status
 
 import logging
@@ -47,8 +47,12 @@ async def _check_job_status_mock(job_id) -> str:
 @router.get("/page/{job_id}")
 async def render_result_page(request: Request, job_id: Union[int, str]):
 
-    if get_job_status(job_id) == STATE_COMPLETE:
+    cached_job_status = get_job_status(job_id)
+
+    if cached_job_status.upper() == STATE_COMPLETE:
         status = STATE_COMPLETE
+    elif cached_job_status == STATE_ERROR:
+        return {"Error": "Job does not exist"}
     else:
         status = await check_job_status(job_id)
 
@@ -77,6 +81,7 @@ async def get_results(job_id: Union[str, int]):
     response = PredictJobResponse(job_id=job_id, status=status)
 
     if status.upper() == STATE_COMPLETE:
+        # save this status so the next request to this page does not have to recheck the status of job
         cache_job_id(job_id, STATE_COMPLETE)
 
     return response
