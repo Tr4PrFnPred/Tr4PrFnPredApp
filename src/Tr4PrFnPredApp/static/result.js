@@ -3,6 +3,14 @@ function goToHomepage() {
     window.location.href = "/";
 }
 
+function downloadResultsFetch(job_id) {
+
+    return function downloadResults() {
+
+        window.open(`/result/download/${job_id}`, '_blank')
+    }
+}
+
 function filterContent() {
 
     let filter = document.getElementById("filter");
@@ -29,6 +37,11 @@ function addFilterEventListeners() {
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
+    // get the job id via the url
+    // regex gets the last string following the last /
+    let job_id = window.location.href.match(/[^\/]+$/);
+
     document.getElementById("backButton").addEventListener("click", goToHomepage);
+    document.getElementById("download-button").addEventListener("click", downloadResultsFetch(job_id));
     addFilterEventListeners();
 });

@@ -1,8 +1,12 @@
-import logging
+import aiofiles
+import aiofiles.os
+import json
 from typing import Union
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import FileResponse
+from fastapi import BackgroundTasks
 
 from Tr4PrFnPredLib.jobs.submit import check_job_status
 from Tr4PrFnPredLib.jobs.fetch import fetch_results
@@ -86,3 +90,27 @@ async def get_results(job_id: Union[str, int]):
 
     return response
 
+
+async def remove_file_after_download(path: str):
+    await aiofiles.os.remove(path)
+
+
+@router.get("/download/{job_id}")
+async def download_results(job_id: Union[str, int], background_tasks: BackgroundTasks):
+
+    cached_job_status = get_job_status(job_id)
+
+    if cached_job_status.upper() == STATE_COMPLETE:
+
+        results = await fetch_results(job_id)
+        response_file_path = f'{job_id}-temp.json'
+
+        background_tasks.add_task(remove_file_after_download, response_file_path)
+
+        # FIXME: Need to return a JSON here but considere just saving results as JSON in future and remove this code
+        async with aiofiles.open(response_file_path, "w") as f:
+            await f.write(json.dumps(results))
+
+        return FileResponse(response_file_path, media_type="application/octet-stream", filename=f'{job_id}.json')
+    elif cached_job_status == STATE_ERROR:
+        return {"Error": "Job does not exist"}
