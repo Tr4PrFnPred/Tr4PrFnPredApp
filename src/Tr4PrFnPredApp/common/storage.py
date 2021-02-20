@@ -8,7 +8,7 @@ def get_job_status(job_id: str, host="localhost", port=6379) -> str:
 
     values = r.hmget(job_id, "status")
 
-    if len(values == 0):
+    if len(values) == 0:
         # this job does not exist
         job_status = STATE_ERROR
     else:

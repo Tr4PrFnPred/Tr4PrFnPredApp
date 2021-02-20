@@ -1,6 +1,7 @@
 import aiofiles
 import aiofiles.os
 import json
+import numpy
 from typing import Union
 
 from fastapi import APIRouter, Request
@@ -29,23 +30,6 @@ router = APIRouter(
         200: {"description": "Get successful"}
     },
 )
-
-
-# FIXME: remove after testing
-async def _check_job_status_mock(job_id) -> str:
-
-    from random import randint
-    from asyncio import sleep
-
-    status = randint(0, 3)
-    await sleep(10)
-    if status == 0:
-        return "COMPLETED"
-    elif status == 1:
-        return "PENDING"
-    else:
-        return "RUNNING"
-    # return "COMPLETED"
 
 
 @router.get("/page/{job_id}")
@@ -91,7 +75,27 @@ async def get_results(job_id: Union[str, int]):
     return response
 
 
+class CustomEncoder(json.JSONEncoder):
+    """
+        Custom JSON encoder to encode numpy types.
+    """
+    def default(self, obj):
+        if isinstance(obj, numpy.integer):
+            return int(obj)
+        elif isinstance(obj, numpy.floating):
+            return float(obj)
+        elif isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        else:
+            return super(CustomEncoder, self).default(obj)
+
+
 async def remove_file_after_download(path: str):
+    """
+    Background task for the download_results endpoint to delete the temporary file created.
+
+    :param path: Path of file to delete
+    """
     await aiofiles.os.remove(path)
 
 
@@ -107,9 +111,9 @@ async def download_results(job_id: Union[str, int], background_tasks: Background
 
         background_tasks.add_task(remove_file_after_download, response_file_path)
 
-        # FIXME: Need to return a JSON here but considere just saving results as JSON in future and remove this code
+        # FIXME: Need to return a JSON here but consider just saving results as JSON in future and remove this code
         async with aiofiles.open(response_file_path, "w") as f:
-            await f.write(json.dumps(results))
+            await f.write(json.dumps(results, cls=CustomEncoder))
 
         return FileResponse(response_file_path, media_type="application/octet-stream", filename=f'{job_id}.json')
     elif cached_job_status == STATE_ERROR:
