@@ -3,6 +3,15 @@ function goToHomepage() {
     window.location.href = "/";
 }
 
+function copyJobId() {
+    let selectionRange = document.createRange();
+    selectionRange.selectNode(document.getElementById("job-id"));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(selectionRange);
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();
+}
+
 function downloadResultsFetch(job_id) {
 
     return function downloadResults() {
@@ -42,6 +51,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     let job_id = window.location.href.match(/[^\/]+$/);
 
     document.getElementById("backButton").addEventListener("click", goToHomepage);
-    document.getElementById("download-button").addEventListener("click", downloadResultsFetch(job_id));
-    addFilterEventListeners();
+    document.getElementById("copy-button").addEventListener("click", copyJobId);
+
+    let downloadButton = document.getElementById("download-button");
+    if (downloadButton) {
+        downloadButton.addEventListener("click", downloadResultsFetch(job_id));
+    }
+
+    if (document.getElementById("filter")) {
+        addFilterEventListeners();
+    }
 });
