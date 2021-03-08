@@ -52,12 +52,33 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 
         results = await fetch_results(job_id)
 
+        # TODO: clean up this code
+
         terms_and_score_predictions = results['terms']
 
+        # select the go terms with the highest scores for each protein sequence prediction
+        terms_and_score_predictions_to_render = []
+
+        for term_and_score_dict in terms_and_score_predictions:
+            term_and_score_sorted = dict(sorted(term_and_score_dict.items(), key=lambda item: item[1], reverse=True))
+            term_and_score_selected = []
+            for i, term_score_pair in enumerate(term_and_score_sorted):
+                if i == 20:  # select the top 20 scores
+                    break
+                term_and_score_selected.append((term_score_pair, term_and_score_sorted[term_score_pair]))
+            terms_and_score_predictions_to_render.append(term_and_score_selected)
+
         # create d3 network graph json
-        all_terms = [list(terms_list.keys()) for terms_list in terms_and_score_predictions]
+
+        # get the GO terms and remove the scores
+        all_terms = list(map(lambda term_list:
+                             list(map(lambda term: term[0], term_list)),
+                             terms_and_score_predictions_to_render))
+
+        # used for traversing the go ontology
         go_ont = load_ontology()
 
+        # create json required for visualizations for each protein sequence GO term predictions
         visualizations_json_data = []
         for terms in all_terms:
             nodes, links = create_d3_network_json_for_terms(terms, go_ont)
@@ -67,7 +88,7 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
                                                           "status": status,
                                                           "results": zip(results["entries"],
                                                                          results["sequences"],
-                                                                         terms_and_score_predictions,
+                                                                         terms_and_score_predictions_to_render,
                                                                          results["namespaces"],
                                                                          visualizations_json_data),
                                                           "isComplete": True})

@@ -47,16 +47,17 @@
                                 <td colspan="5">
                                     <button entry="{{entry}}" visualized="false" class="btn btn-primary" onclick="tester(event)" nodes="{{visualizations_json_data['nodes']}}" links="{{visualizations_json_data['links']}}">View Visualization</button>
                                     <div id="{{entry}}-vis" style="display: none">
+                                        <div id="{{entry}}-vis-graph"></div>
                                     </div>
                                 </td>
                             </tr>
-                            {% for term, score in terms.items() %}
+                            {% for term_score_pair in terms %}
                             <tr entry="{{entry}}">
                                 <td></td>
                                 <td></td>
                                 <!-- url for more information on GO term -->
-                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term }}</a></td>
-                                <td>{{ score }}</td>
+                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term_score_pair[0] }}</a></td>
+                                <td>{{ term_score_pair[1] }}</td>
                                 <td>molecular_function</td>
                             </tr>
                             {% endfor %}

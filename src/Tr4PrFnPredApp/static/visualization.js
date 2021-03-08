@@ -37,7 +37,7 @@ let network_graph_render = function(graph, entry) {
         .force('charge', d3.forceManyBody().strength(-300))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    let svg = d3.select(`#${entry}-vis`)
+    let svg = d3.select(`#${entry}-vis-graph`)
                     .append("svg")
                     .attr("width", width)
                     .attr("height", height);
