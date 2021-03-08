@@ -51,7 +51,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     let job_id = window.location.href.match(/[^\/]+$/);
 
     document.getElementById("backButton").addEventListener("click", goToHomepage);
-    document.getElementById("copy-button").addEventListener("click", copyJobId);
+
+    let copyButton = document.getElementById("copy-button");
+    if (copyButton) {
+        copyButton.addEventListener("click", copyJobId);
+    }
 
     let downloadButton = document.getElementById("download-button");
     if (downloadButton) {

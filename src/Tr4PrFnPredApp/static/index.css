@@ -50,6 +50,13 @@ body {
     overflow: hidden;
 }
 
+/* Home page */
+
+#about-page {
+    width: 900px;
+    margin: 0 auto;
+}
+
 /* Submit page */
 
 #submit-wrapper {

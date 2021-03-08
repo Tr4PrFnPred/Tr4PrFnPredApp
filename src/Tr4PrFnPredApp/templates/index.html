@@ -18,6 +18,9 @@
                 <div id="nav">
                     <ul class="nav nav-tabs">
                         <li class="nav-item active">
+                            <a href="#" id="about" class="nav-link" onclick="switchTabs(event, 'about-wrapper')">Home</a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" id="submit" class="nav-link" onclick="switchTabs(event, 'submit-wrapper')">Submit</a>
                         </li>
                         <li class="nav-item">
@@ -28,7 +31,12 @@
             </div>
         </div>
         <div id="content">
-            <div id="submit-wrapper" class="tab" style="display: block">
+            <div id="about-wrapper" class="tab" style="display: block">
+                <div id="about-page">
+                    <p>This is a sentence.</p>
+                </div>
+            </div>
+            <div id="submit-wrapper" class="tab" style="display: none">
                 <div id="submit-page">
                     <form id="job-form" enctype="multipart/form-data" method="POST">
                         <div class="form-group">

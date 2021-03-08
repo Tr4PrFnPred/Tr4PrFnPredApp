@@ -9,6 +9,8 @@
     {% if not isComplete %}
     <script src="{{ url_for('static', path='/result-poll.js') }}"></script>
     {% endif %}
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="{{ url_for('static', path='/visualization.js') }}"></script>
 </head>
 <body>
     <div id="header">
@@ -35,10 +37,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for entry, seq, terms in results %}
+                        {% for entry, seq, terms, namespaces, visualizations_json_data in results %}
                             <tr entry="{{entry}}">
                                 <td>{{ entry }}</td>
                                 <td>{{ seq }}</td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr entry="{{entry}}">
+                                <td colspan="5">
+                                    <button entry="{{entry}}" visualized="false" class="btn btn-primary" onclick="tester(event)" nodes="{{visualizations_json_data['nodes']}}" links="{{visualizations_json_data['links']}}">View Visualization</button>
+                                    <div id="{{entry}}-vis" style="display: none">
+                                    </div>
+                                </td>
                             </tr>
                             {% for term, score in terms.items() %}
                             <tr entry="{{entry}}">

@@ -19,7 +19,7 @@ from .routers import predict, model, result
 app = FastAPI(
     title="Transformers for Protein Function Prediction",
     description="API for Transformers for Protein Function Prediction",
-    versio="0.0.1"
+    version="0.0.1"
 )
 
 # enable CORS

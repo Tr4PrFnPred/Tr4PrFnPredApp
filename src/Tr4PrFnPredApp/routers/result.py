@@ -12,10 +12,12 @@ from fastapi import BackgroundTasks
 from Tr4PrFnPredLib.jobs.submit import check_job_status
 from Tr4PrFnPredLib.jobs.fetch import fetch_results
 from Tr4PrFnPredLib.utils.storage import cache_job_id
+from Tr4PrFnPredLib.utils.ontology import load_ontology
 
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE, STATE_ERROR
 from ..common.storage import get_job_status
+from ..utils.visualizations import create_d3_network_json_for_terms
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -50,10 +52,24 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 
         results = await fetch_results(job_id)
 
+        terms_and_score_predictions = results['terms']
+
+        # create d3 network graph json
+        all_terms = [list(terms_list.keys()) for terms_list in terms_and_score_predictions]
+        go_ont = load_ontology()
+
+        visualizations_json_data = []
+        for terms in all_terms:
+            nodes, links = create_d3_network_json_for_terms(terms, go_ont)
+            visualizations_json_data.append({"nodes": json.dumps(nodes), "links": json.dumps(links)})
+
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id,
                                                           "status": status,
                                                           "results": zip(results["entries"],
-                                                                         results["sequences"], results["terms"]),
+                                                                         results["sequences"],
+                                                                         terms_and_score_predictions,
+                                                                         results["namespaces"],
+                                                                         visualizations_json_data),
                                                           "isComplete": True})
 
     else:
