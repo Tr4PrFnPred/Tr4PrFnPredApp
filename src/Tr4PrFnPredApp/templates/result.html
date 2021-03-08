@@ -45,19 +45,26 @@
                             </tr>
                             <tr entry="{{entry}}">
                                 <td colspan="5">
-                                    <button entry="{{entry}}" visualized="false" class="btn btn-primary" onclick="tester(event)" nodes="{{visualizations_json_data['nodes']}}" links="{{visualizations_json_data['links']}}">View Visualization</button>
+                                    <button entry="{{entry}}"
+                                            visualized="false"
+                                            class="btn btn-primary"
+                                            onclick="generate_network_graph(event)"
+                                            nodes="{{visualizations_json_data['nodes']}}"
+                                            links="{{visualizations_json_data['links']}}"
+                                            scatter="{{visualizations_json_data['scatter']}}">View Visualization</button>
                                     <div id="{{entry}}-vis" style="display: none">
                                         <div id="{{entry}}-vis-graph"></div>
+                                        <svg id="{{entry}}-vis-scatter" width="900" height="640"></svg>
                                     </div>
                                 </td>
                             </tr>
-                            {% for term_score_pair in terms %}
+                            {% for term, score in terms.items() %}
                             <tr entry="{{entry}}">
                                 <td></td>
                                 <td></td>
                                 <!-- url for more information on GO term -->
-                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term_score_pair[0] }}</a></td>
-                                <td>{{ term_score_pair[1] }}</td>
+                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term }}</a></td>
+                                <td>{{ score }}</td>
                                 <td>molecular_function</td>
                             </tr>
                             {% endfor %}

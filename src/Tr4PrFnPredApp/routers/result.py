@@ -17,7 +17,7 @@ from Tr4PrFnPredLib.utils.ontology import load_ontology
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE, STATE_ERROR
 from ..common.storage import get_job_status
-from ..utils.visualizations import create_d3_network_json_for_terms
+from ..utils.visualizations import create_d3_network_json_for_terms, create_d3_scatter_json_for_terms
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -61,28 +61,29 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 
         for term_and_score_dict in terms_and_score_predictions:
             term_and_score_sorted = dict(sorted(term_and_score_dict.items(), key=lambda item: item[1], reverse=True))
-            term_and_score_selected = []
-            for i, term_score_pair in enumerate(term_and_score_sorted):
+            terms_and_scores_selected = {}
+            for i, term in enumerate(term_and_score_sorted):
                 if i == 20:  # select the top 20 scores
                     break
-                term_and_score_selected.append((term_score_pair, term_and_score_sorted[term_score_pair]))
-            terms_and_score_predictions_to_render.append(term_and_score_selected)
+                terms_and_scores_selected[term] = term_and_score_sorted[term]
+            terms_and_score_predictions_to_render.append(terms_and_scores_selected)
 
         # create d3 network graph json
 
         # get the GO terms and remove the scores
-        all_terms = list(map(lambda term_list:
-                             list(map(lambda term: term[0], term_list)),
-                             terms_and_score_predictions_to_render))
+        all_terms = list(map(lambda term_and_score: list(term_and_score.keys()), terms_and_score_predictions_to_render))
 
         # used for traversing the go ontology
         go_ont = load_ontology()
 
         # create json required for visualizations for each protein sequence GO term predictions
         visualizations_json_data = []
-        for terms in all_terms:
+        for i, terms in enumerate(all_terms):
             nodes, links = create_d3_network_json_for_terms(terms, go_ont)
-            visualizations_json_data.append({"nodes": json.dumps(nodes), "links": json.dumps(links)})
+            scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render)
+            visualizations_json_data.append({"nodes": json.dumps(nodes),
+                                             "links": json.dumps(links),
+                                             "scatter": json.dumps(scatter)})
 
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id,
                                                           "status": status,

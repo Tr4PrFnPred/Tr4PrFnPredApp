@@ -1,4 +1,4 @@
-function tester(event) {
+function generate_network_graph(event) {
 
     let entry = event.target.getAttribute("entry");
     let visualized = event.target.getAttribute("visualized");
@@ -9,6 +9,7 @@ function tester(event) {
         if (visualized === "false") {
             let nodes = JSON.parse(event.target.getAttribute("nodes"));
             let links = JSON.parse(event.target.getAttribute("links"));
+            let scatter = JSON.parse(event.target.getAttribute("scatter"));
 
             let graph = {
                 nodes: nodes,
@@ -16,6 +17,7 @@ function tester(event) {
             };
 
             network_graph_render(graph, entry);
+            scatter_plot_render(scatter, entry);
             event.target.setAttribute("visualized", true);
         }
 
@@ -24,6 +26,86 @@ function tester(event) {
         visualizationDiv.style.display = "none";
     }
 }
+
+let scatter_plot_render = function(data, entry) {
+    console.log(data);
+
+      const xValue = d => d.name;
+      const yValue = d => d.value;
+      const yLabel = 'Score';
+      const margin = { left: 150, right: 70, top: 20, bottom: 110 };
+
+      const svg = d3.select(`#${entry}-vis-scatter`);
+      const width = svg.attr('width');
+      const height = svg.attr('height');
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const g = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+      const xAxisG = g.append('g')
+          .attr('transform', `translate(0, ${innerHeight})`);
+      const yAxisG = g.append('g');
+
+      /* X and Y Axis labels */
+      xAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth / 2)
+          .attr('y', 90);
+
+      yAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', -innerHeight / 2)
+          .attr('y', -100)
+          .attr('transform', `rotate(-90)`)
+          .style('text-anchor', 'middle')
+          .text(yLabel);
+      /* X and Y Axis labels */
+
+      /* X and Y Axis ticks */
+      const xScale = d3.scalePoint();
+      const yScale = d3.scaleLinear().domain([0, 1]);
+
+      const xAxis = d3.axisBottom()
+        .scale(xScale)
+        .tickPadding(15)
+        .tickSize(-innerHeight);
+
+      const yTicks = 5;
+      const yAxis = d3.axisLeft()
+        .scale(yScale)
+        .ticks(yTicks)
+        .tickPadding(15)
+        .tickSize(-innerWidth);
+
+      /* X and Y Axis ticks */
+
+      xScale
+          .domain(data.map(d => d.name))
+          .range([0, innerWidth]);
+
+      yScale
+          .domain(d3.extent(data, d => d.value))
+          .range([innerHeight, 0])
+          .nice(yTicks);
+
+      g.selectAll('circle').data(data)
+          .enter().append('circle')
+            .attr('cx', d => xScale(xValue(d)))
+            .attr('cy', d => yScale(yValue(d)))
+            .attr('fill', 'blue')
+            .attr('fill-opacity', 0.6)
+            .attr('r', 8);
+
+      xAxisG.call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+      yAxisG.call(yAxis);
+};
+
 
 let network_graph_render = function(graph, entry) {
 
@@ -41,9 +123,6 @@ let network_graph_render = function(graph, entry) {
                     .append("svg")
                     .attr("width", width)
                     .attr("height", height);
-                    // .call(d3.zoom().on("zoom", function () {
-                    //    svg.attr("transform", d3.event.transform)
-                    // }));
 
     let link = svg.append("g")
                     .attr("class", "links")
@@ -74,14 +153,14 @@ let network_graph_render = function(graph, entry) {
           .text(function(d) {
             return d.id;
           })
-          .attr('x', 20)
+          .attr('x', 25)
           .attr('y', 2);
 
     let namespaces = node.append("text")
           .text(function(d) {
             return d.group;
           })
-          .attr('x', 20)
+          .attr('x', 25)
           .attr('y', 15);
 
     node.append("title")
