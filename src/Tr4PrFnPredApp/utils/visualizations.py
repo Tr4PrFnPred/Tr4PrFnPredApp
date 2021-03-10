@@ -49,14 +49,13 @@ def create_d3_network_json_for_terms(terms, go_ont):
     return nodes, links
 
 
-def create_d3_scatter_json_for_terms(all_terms_to_render):
+def create_d3_scatter_json_for_terms(terms_to_render):
 
     terms_score_dict_pairs = []
 
-    for terms_to_render in all_terms_to_render:
+    for term, value in terms_to_render.items():
 
-        for name in list(terms_to_render.keys()):
-            terms_score_dict = {'name': name, 'value': terms_to_render[name]}
-            terms_score_dict_pairs.append(terms_score_dict)
+        terms_score_dict = {'name': term, 'value': value}
+        terms_score_dict_pairs.append(terms_score_dict)
 
     return terms_score_dict_pairs

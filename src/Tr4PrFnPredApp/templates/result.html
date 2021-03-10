@@ -10,6 +10,7 @@
     <script src="{{ url_for('static', path='/result-poll.js') }}"></script>
     {% endif %}
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="{{ url_for('static', path='/visualization.js') }}"></script>
 </head>
 <body>
@@ -53,8 +54,10 @@
                                             links="{{visualizations_json_data['links']}}"
                                             scatter="{{visualizations_json_data['scatter']}}">View Visualization</button>
                                     <div id="{{entry}}-vis" style="display: none">
+                                        <h2>GO Network Graph</h2>
                                         <div id="{{entry}}-vis-graph"></div>
-                                        <svg id="{{entry}}-vis-scatter" width="900" height="640"></svg>
+                                        <h2>One Versus All Graph</h2>
+                                        <div id="{{entry}}-vis-scatter"></div>
                                     </div>
                                 </td>
                             </tr>

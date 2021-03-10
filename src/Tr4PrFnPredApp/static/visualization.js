@@ -28,89 +28,35 @@ function generate_network_graph(event) {
 }
 
 let scatter_plot_render = function(data, entry) {
-    console.log(data);
 
-      const xValue = d => d.name;
-      const yValue = d => d.value;
-      const yLabel = 'Score';
-      const margin = { left: 150, right: 70, top: 20, bottom: 110 };
+    const trace1 = {
+        x: Array.from({length: data.length}, (_, i) => i + 1),
+        y: data.map(term => term.value),
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Team A',
+        text: data.map(term => term.name),
+        marker: { size: 12 }
+    };
 
-      const svg = d3.select(`#${entry}-vis-scatter`);
-      const width = svg.attr('width');
-      const height = svg.attr('height');
-      const innerWidth = width - margin.left - margin.right;
-      const innerHeight = height - margin.top - margin.bottom;
+    const layout = {
+          xaxis: {
+            range: [ 1, data.length ]
+          },
+          yaxis: {
+            range: [0, 1]
+          },
+          title:'One Versus All Graph'
+    };
 
-      const g = svg.append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`);
-      const xAxisG = g.append('g')
-          .attr('transform', `translate(0, ${innerHeight})`);
-      const yAxisG = g.append('g');
-
-      /* X and Y Axis labels */
-      xAxisG.append('text')
-          .attr('class', 'axis-label')
-          .attr('x', innerWidth / 2)
-          .attr('y', 90);
-
-      yAxisG.append('text')
-          .attr('class', 'axis-label')
-          .attr('x', -innerHeight / 2)
-          .attr('y', -100)
-          .attr('transform', `rotate(-90)`)
-          .style('text-anchor', 'middle')
-          .text(yLabel);
-      /* X and Y Axis labels */
-
-      /* X and Y Axis ticks */
-      const xScale = d3.scalePoint();
-      const yScale = d3.scaleLinear().domain([0, 1]);
-
-      const xAxis = d3.axisBottom()
-        .scale(xScale)
-        .tickPadding(15)
-        .tickSize(-innerHeight);
-
-      const yTicks = 5;
-      const yAxis = d3.axisLeft()
-        .scale(yScale)
-        .ticks(yTicks)
-        .tickPadding(15)
-        .tickSize(-innerWidth);
-
-      /* X and Y Axis ticks */
-
-      xScale
-          .domain(data.map(d => d.name))
-          .range([0, innerWidth]);
-
-      yScale
-          .domain(d3.extent(data, d => d.value))
-          .range([innerHeight, 0])
-          .nice(yTicks);
-
-      g.selectAll('circle').data(data)
-          .enter().append('circle')
-            .attr('cx', d => xScale(xValue(d)))
-            .attr('cy', d => yScale(yValue(d)))
-            .attr('fill', 'blue')
-            .attr('fill-opacity', 0.6)
-            .attr('r', 8);
-
-      xAxisG.call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-65)");
-      yAxisG.call(yAxis);
+    Plotly.newPlot(`${entry}-vis-scatter`, [trace1], layout);
 };
 
 
 let network_graph_render = function(graph, entry) {
 
-    let width = 900;
-    let height = 640;
+    const width = 900;
+    const height = 640;
 
     const color = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -119,12 +65,12 @@ let network_graph_render = function(graph, entry) {
         .force('charge', d3.forceManyBody().strength(-300))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    let svg = d3.select(`#${entry}-vis-graph`)
+    const svg = d3.select(`#${entry}-vis-graph`)
                     .append("svg")
                     .attr("width", width)
                     .attr("height", height);
 
-    let link = svg.append("g")
+    const link = svg.append("g")
                     .attr("class", "links")
                     .selectAll("line")
                     .data(graph.links)
@@ -135,13 +81,13 @@ let network_graph_render = function(graph, entry) {
                         return "#000000";
                     });
 
-    let node = svg.append("g")
+    const node = svg.append("g")
                   .attr("class", "nodes")
                   .selectAll("g")
                   .data(graph.nodes)
                   .enter().append("g");
 
-    let circles = node.append("circle")
+    const circles = node.append("circle")
                       .attr("r", 25)
                       .attr("fill", function(d) { return color(d.group); })
                       .call(d3.drag()
@@ -149,14 +95,14 @@ let network_graph_render = function(graph, entry) {
                           .on("drag", dragged)
                           .on("end", dragended));
 
-    let lables = node.append("text")
+    const lables = node.append("text")
           .text(function(d) {
             return d.id;
           })
           .attr('x', 25)
           .attr('y', 2);
 
-    let namespaces = node.append("text")
+    const namespaces = node.append("text")
           .text(function(d) {
             return d.group;
           })
