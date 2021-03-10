@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import predict, model, result
+from .routers import predict, result
 
 app = FastAPI(
     title="Transformers for Protein Function Prediction",
@@ -34,11 +34,10 @@ app.add_middleware(
 
 # include routers
 app.include_router(predict.router)
-app.include_router(model.router)
 app.include_router(result.router)
 
 # mount static and template files
-app.mount("/static", StaticFiles(directory="src/Tr4PrFnPredApp/static/"), name="static")
+app.mount("/tr4prfn/static", StaticFiles(directory="src/Tr4PrFnPredApp/static/"), name="static")
 templates = Jinja2Templates(directory="src/Tr4PrFnPredApp/templates/")
 
 # loggers
@@ -51,7 +50,7 @@ if 'win32' in sys.platform:
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 # home page
-@app.get("/", response_class=HTMLResponse)
+@app.get("/tr4prfn", response_class=HTMLResponse)
 async def home_page(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 

@@ -1,12 +1,12 @@
 from fastapi import APIRouter
-from ..schema.predict import PostPredict, PredictResponse, PredictJobResponse
+from ..schema.predict import PostPredict, PredictJobResponse
 
 from Tr4PrFnPredLib.jobs.submit import submit_and_get_job_id
 from fastapi import File, UploadFile, Form
 
 
 router = APIRouter(
-    prefix="/predict",
+    prefix="/tr4prfn/predict",
     tags=["predict"],
     responses={
         200: {"description": "Post successful"}

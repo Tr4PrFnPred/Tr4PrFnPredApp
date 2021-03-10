@@ -1,6 +1,6 @@
 function goToHomepage() {
 
-    window.location.href = "/";
+    window.location.href = "/tr4prfn";
 }
 
 function copyJobId() {
@@ -16,7 +16,7 @@ function downloadResultsFetch(job_id) {
 
     return function downloadResults() {
 
-        window.open(`/result/download/${job_id}`, '_blank')
+        window.open(`/tr4prfn/result/download/${job_id}`, '_blank')
     }
 }
 

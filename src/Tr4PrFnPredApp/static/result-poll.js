@@ -2,7 +2,7 @@
 
 function pollJobStatus(job_id) {
 
-    return fetch(`/result/${job_id}`, {
+    return fetch(`/tr4prfn/result/${job_id}`, {
         "method": "GET",
         "Accept": "application/json"
     }).then((response) => {

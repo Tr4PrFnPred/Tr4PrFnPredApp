@@ -48,10 +48,10 @@ function submitSequence(e) {
 
         if (!sequences_input) {
             let form = document.getElementById("job-form");
-            form.action = "/predict/file";
+            form.action = "/tr4prfn/predict/file";
             form.submit();
 
-            fetch("/predict/file", {
+            fetch("/tr4prfn/predict/file", {
                 method: "post",
                 body: new FormData(form)
             }).then((resp) => {
@@ -59,7 +59,7 @@ function submitSequence(e) {
             }).then(function(data) {
 
                 let jobId = data.job_id;
-                window.location.href = `/result/page/${jobId}`
+                window.location.href = `/tr4prfn/result/page/${jobId}`
             })
         } else {
 
@@ -73,9 +73,7 @@ function submitSequence(e) {
                     }
                 };
 
-            console.info(JSON.stringify(body));
-
-            fetch("/predict", {
+            fetch("/tr4prfn/predict", {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json'
@@ -87,7 +85,7 @@ function submitSequence(e) {
             }).then(function(data) {
 
                 let jobId = data.job_id;
-                window.location.href = `/result/page/${jobId}`
+                window.location.href = `/tr4prfn/result/page/${jobId}`
             })
         }
     }
@@ -98,7 +96,7 @@ function searchResult(e) {
     let jobId = jobIdInput.value;
 
     // redirect page to the result page
-    window.location.href = `/result/page/${jobId}`;
+    window.location.href = `/tr4prfn/result/page/${jobId}`;
 }
 
 function fillExample() {
