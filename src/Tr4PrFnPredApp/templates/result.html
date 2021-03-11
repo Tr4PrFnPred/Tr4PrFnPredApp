@@ -25,8 +25,8 @@
         <div id="content-wrapper">
             {% if isComplete %}
             <div id="results" style="display: block">
-                <input type="text" id="filter" placeholder="Filter table..." title="Filter input">
-                <a id="download-button" class="btn btn-default"><img src="/static/download-icon.png">Download results</img></a>
+                <input type="text" id="filter" placeholder="Filter table..." title="Filter input" style="background-image: url({{url_for('static', path='/search.svg')}})">
+                <a id="download-button" class="btn btn-default"><img src="{{ url_for('static', path='/download-icon.png') }}">Download results</img></a>
                 <table id="resultTable" class="table table-hover table-bordered">
                     <thead class="thead-light">
                         <tr>

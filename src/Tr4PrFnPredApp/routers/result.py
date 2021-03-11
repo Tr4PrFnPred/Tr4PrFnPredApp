@@ -80,7 +80,7 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
         visualizations_json_data = []
         for i, terms in enumerate(all_terms):
             nodes, links = create_d3_network_json_for_terms(terms, go_ont)
-            scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render)
+            scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render[i])
             visualizations_json_data.append({"nodes": json.dumps(nodes),
                                              "links": json.dumps(links),
                                              "scatter": json.dumps(scatter)})
@@ -93,7 +93,6 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
                                                                          results["namespaces"],
                                                                          visualizations_json_data),
                                                           "isComplete": True})
-
     else:
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "isComplete": False})
 
@@ -156,83 +155,3 @@ async def download_results(job_id: Union[str, int], background_tasks: Background
         return FileResponse(response_file_path, media_type="application/octet-stream", filename=f'{job_id}.json')
     elif cached_job_status == STATE_ERROR:
         return {"Error": "Job does not exist"}
-
-
-@router.get("/page/debug/{job_id}")
-async def render_result_page_debug(request: Request, job_id: Union[int, str]):
-
-    status = STATE_COMPLETE
-
-    results = {
-        "entries": ["AASDG", "JKDJFS"],
-        "sequences": ["SDFSJFKSDJFK:LSDF", "SJDFKSJKDSFOISDJFISD"],
-        "terms": [{
-            "GO:0048706": "0.071314",
-            "GO:1904888": "0.620499825",
-            "GO:0048701": "0.022626042",
-            "GO:0048704": "0.84294938",
-            "GO:0060021": "0.015012175"
-        }, {
-            "GO:0048706": "0.0671314",
-            "GO:1904888": "0.020499825",
-            "GO:0048701": "0.522626042",
-            "GO:0048704": "0.04294938",
-            "GO:0060021": "0.915012175"
-        }],
-        "namespaces": [{
-            "GO:0048706": "biological_process",
-            "GO:1904888": "biological_process",
-            "GO:0048701": "biological_process",
-            "GO:0048704": "biological_process",
-            "GO:0060021": "biological_process"
-        }, {
-            "GO:0048706": "molecular_function",
-            "GO:1904888": "molecular_function",
-            "GO:0048701": "molecular_function",
-            "GO:0048704": "molecular_function",
-            "GO:0060021": "molecular_function"
-        }]
-    }
-
-    # TODO: clean up this code
-
-    terms_and_score_predictions = results['terms']
-
-    # select the go terms with the highest scores for each protein sequence prediction
-    terms_and_score_predictions_to_render = []
-
-    for term_and_score_dict in terms_and_score_predictions:
-        term_and_score_sorted = dict(sorted(term_and_score_dict.items(), key=lambda item: item[1], reverse=True))
-        terms_and_scores_selected = {}
-        for i, term in enumerate(term_and_score_sorted):
-            if i == 20:  # select the top 20 scores
-                break
-            terms_and_scores_selected[term] = term_and_score_sorted[term]
-        terms_and_score_predictions_to_render.append(terms_and_scores_selected)
-
-    # create d3 network graph json
-
-    # get the GO terms and remove the scores
-    all_terms = list(map(lambda term_and_score: list(term_and_score.keys()), terms_and_score_predictions_to_render))
-
-    # used for traversing the go ontology
-    go_ont = load_ontology()
-
-    # create json required for visualizations for each protein sequence GO term predictions
-    visualizations_json_data = []
-    print(terms_and_score_predictions_to_render)
-    for i, terms in enumerate(all_terms):
-        nodes, links = create_d3_network_json_for_terms(terms, go_ont)
-        scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render[i])
-        visualizations_json_data.append({"nodes": json.dumps(nodes),
-                                         "links": json.dumps(links),
-                                         "scatter": json.dumps(scatter)})
-
-    return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id,
-                                                      "status": status,
-                                                      "results": zip(results["entries"],
-                                                                     results["sequences"],
-                                                                     terms_and_score_predictions_to_render,
-                                                                     results["namespaces"],
-                                                                     visualizations_json_data),
-                                                      "isComplete": True})
