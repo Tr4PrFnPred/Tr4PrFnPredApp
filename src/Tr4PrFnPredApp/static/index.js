@@ -40,7 +40,6 @@ function submitSequence(e) {
         input.className = "form-control is-invalid";
     } else {
 
-        // disappear when successful
         document.getElementById("sequences-invalid").style.display = "none";
 
         // set valid textarea form
@@ -56,22 +55,15 @@ function submitSequence(e) {
                 body: new FormData(form)
             }).then((resp) => {
                 return resp.json();
-            }).then(function(data) {
-
-                let jobId = data.job_id;
-                window.location.href = `/tr4prfn/result/page/${jobId}`
-            })
+            }).then(redirectToResultPage)
         } else {
 
-            let sequences = sequences_input;
-
-
             let body = {
-                    "data": {
-                        "model": model,
-                        "sequences": sequences
-                    }
-                };
+                "data": {
+                    "model": model,
+                    "sequences": sequences_input
+                }
+            };
 
             fetch("/tr4prfn/predict", {
                 method: 'post',
@@ -80,15 +72,21 @@ function submitSequence(e) {
                 },
                 cache: 'no-cache',
                 body: JSON.stringify(body)
-            }).then(function(response) {
+            }).then(function (response) {
                 return response.json();
-            }).then(function(data) {
+            }).then(redirectToResultPage);
 
-                let jobId = data.job_id;
-                window.location.href = `/tr4prfn/result/page/${jobId}`
-            })
+            // display loading icon and disable submit button to prevent multiple requests
+            document.getElementById("submit-button").disabled = true;
+            document.getElementById("loading-icon").style.display = "inline-block";
         }
     }
+}
+
+function redirectToResultPage(data) {
+
+    let jobId = data.job_id;
+    window.location.href = `/tr4prfn/result/page/${jobId}`
 }
 
 function searchResult(e) {
