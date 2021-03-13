@@ -33,7 +33,18 @@
         <div id="content">
             <div id="about-wrapper" class="tab" style="display: block">
                 <div id="about-page">
-                    <p>This is a sentence.</p>
+                    <div id="about-content">
+                        <h2>About</h2>
+                        <p>Protein function prediction is important for understanding life and how diseases function.
+    Due to this importance, there are competitions such as the Critical Assessment of Functional Annotation (or CAFA) that exists as a challenge to improve our ability to accomplish this task.
+    One of the dominant techniques used in CAFA is machine learning. In this project, we will attempt to contribute to solving the protein function prediction problem with the use of the
+    Transformers machine learning model.</p>
+                        <h2>How to Use</h2>
+                        <p>Click on "Submit" Tab</p>
+                        <img src="{{ url_for('static', path='/howtouse.png')}}" style="width: 100%" alt="How to Use" />
+                        <h4>Contributors</h4>
+                        <p>Made by Christopher Wang and Derek Shao</p>
+                    </div>
                 </div>
             </div>
             <div id="submit-wrapper" class="tab" style="display: none">
@@ -44,7 +55,6 @@
                             <select id="model-select" class="form-control" name="model_type">
                                 <option>ProtBERT</option>
                                 <option>DeepGOPlus</option>
-                                <option>GOLabeler</option>
                             </select>
                         </div>
                         <div class="form-group">

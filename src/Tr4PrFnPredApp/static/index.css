@@ -57,6 +57,12 @@ body {
     margin: 0 auto;
 }
 
+#about-content {
+    margin-top: 1em;
+    text-align: justify;
+    text-justify: inter-word;
+}
+
 /* Submit page */
 
 #submit-wrapper {
