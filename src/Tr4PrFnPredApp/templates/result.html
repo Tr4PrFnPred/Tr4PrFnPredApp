@@ -61,14 +61,14 @@
                                     </div>
                                 </td>
                             </tr>
-                            {% for term, score in terms.items() %}
+                            {% for i, (entry, score) in terms %}
                             <tr entry="{{entry}}">
                                 <td></td>
                                 <td></td>
                                 <!-- url for more information on GO term -->
-                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ term }}</a></td>
+                                <td><a href="http://amigo.geneontology.org/amigo/term/{{term}}" target="_blank" rel="noopener">{{ entry }}</a></td>
                                 <td>{{ score }}</td>
-                                <td>molecular_function</td>
+				<td>{{ namespaces[entry] }}</td>
                             </tr>
                             {% endfor %}
                         {% endfor %}

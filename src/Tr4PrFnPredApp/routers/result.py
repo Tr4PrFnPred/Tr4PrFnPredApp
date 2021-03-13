@@ -68,14 +68,12 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
                 terms_and_scores_selected[term] = term_and_score_sorted[term]
             terms_and_score_predictions_to_render.append(terms_and_scores_selected)
 
-        # create d3 network graph json
-
         # get the GO terms and remove the scores
         all_terms = list(map(lambda term_and_score: list(term_and_score.keys()), terms_and_score_predictions_to_render))
 
         # used for traversing the go ontology
         go_ont = load_ontology()
-
+        
         # create json required for visualizations for each protein sequence GO term predictions
         visualizations_json_data = []
         for i, terms in enumerate(all_terms):
@@ -89,7 +87,7 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
                                                           "status": status,
                                                           "results": zip(results["entries"],
                                                                          results["sequences"],
-                                                                         terms_and_score_predictions_to_render,
+                                                                         list(map(lambda x: enumerate(x.items()), terms_and_score_predictions_to_render)),
                                                                          results["namespaces"],
                                                                          visualizations_json_data),
                                                           "isComplete": True})

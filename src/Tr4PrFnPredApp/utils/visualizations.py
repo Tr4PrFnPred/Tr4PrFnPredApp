@@ -55,7 +55,7 @@ def create_d3_scatter_json_for_terms(terms_to_render):
 
     for term, value in terms_to_render.items():
 
-        terms_score_dict = {'name': term, 'value': value}
+        terms_score_dict = {'name': term, 'value': float(value)}
         terms_score_dict_pairs.append(terms_score_dict)
 
     return terms_score_dict_pairs
