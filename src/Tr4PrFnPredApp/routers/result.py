@@ -16,7 +16,7 @@ from Tr4PrFnPredLib.utils.ontology import load_ontology
 
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE, STATE_ERROR
-from ..common.storage import get_job_status
+from ..common.storage import get_job_status as get_cached_status
 from ..utils.visualizations import create_d3_network_json_for_terms, create_d3_scatter_json_for_terms
 
 import logging
@@ -34,63 +34,93 @@ router = APIRouter(
 )
 
 
+def get_terms_and_score_predictions_render(terms_and_score_predictions):
+    """
+    From the full collection of terms and scores, select a number of terms and score predictions to render.
+
+    :param terms_and_score_predictions: All terms and score predictions
+    :return: List of the terms and scores to render
+    """
+
+    # select the go terms with the highest scores for each protein sequence prediction
+    terms_and_score_predictions_to_render = []
+
+    for term_and_score_dict in terms_and_score_predictions:
+        # sort the scores
+        term_and_score_sorted = dict(sorted(term_and_score_dict.items(), key=lambda item: item[1], reverse=True))
+
+        # GO term : score pairs
+        selected_terms_and_scores_pairs = {}
+        for i, term in enumerate(term_and_score_sorted):
+            if i == 50: # select the top 50 scores
+                break
+            selected_terms_and_scores_pairs[term] = term_and_score_sorted[term]
+        terms_and_score_predictions_to_render.append(selected_terms_and_scores_pairs)
+
+    return terms_and_score_predictions_to_render
+
+
+def create_visualization_data(all_terms_predicted, terms_and_score_predictions_to_render, go_ontology):
+
+    # create json required for visualizations for each protein sequence GO term predictions
+    visualizations_json_data = []
+    for i, terms in enumerate(all_terms_predicted):
+        nodes, links = create_d3_network_json_for_terms(terms, go_ontology)
+        scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render[i])
+        visualizations_json_data.append({"nodes": json.dumps(nodes),
+                                         "links": json.dumps(links),
+                                         "scatter": json.dumps(scatter)})
+
+    return visualizations_json_data
+
+
+def get_job_status(job_id):
+
+    cached_job_status = get_cached_status(job_id)
+
+    if cached_job_status.upper() == STATE_COMPLETE:
+        return STATE_COMPLETE
+    elif cached_job_status == STATE_ERROR:
+        return STATE_ERROR
+    else:
+        return await check_job_status(job_id)
+
+
 @router.get("/page/{job_id}")
 async def render_result_page(request: Request, job_id: Union[int, str]):
 
-    cached_job_status = get_job_status(job_id)
-
-    if cached_job_status.upper() == STATE_COMPLETE:
-        status = STATE_COMPLETE
-    elif cached_job_status == STATE_ERROR:
-        return {"Error": "Job does not exist"}
-    else:
-        status = await check_job_status(job_id)
+    status = get_job_status(job_id)
 
     logger.info(f'Status {status}')
 
     if status.upper() == STATE_COMPLETE:
 
+        go_ontology = load_ontology()
+
         results = await fetch_results(job_id)
 
-        # TODO: clean up this code
-
-        terms_and_score_predictions = results['terms']
-
-        # select the go terms with the highest scores for each protein sequence prediction
-        terms_and_score_predictions_to_render = []
-
-        for term_and_score_dict in terms_and_score_predictions:
-            term_and_score_sorted = dict(sorted(term_and_score_dict.items(), key=lambda item: item[1], reverse=True))
-            terms_and_scores_selected = {}
-            for i, term in enumerate(term_and_score_sorted):
-                if i == 20:  # select the top 20 scores
-                    break
-                terms_and_scores_selected[term] = term_and_score_sorted[term]
-            terms_and_score_predictions_to_render.append(terms_and_scores_selected)
+        terms_and_score_predictions_to_render = get_terms_and_score_predictions_render(results['terms'])
 
         # get the GO terms and remove the scores
-        all_terms = list(map(lambda term_and_score: list(term_and_score.keys()), terms_and_score_predictions_to_render))
+        all_terms_predicted = list(map(lambda term_and_score: list(term_and_score.keys()),
+                                       terms_and_score_predictions_to_render))
 
-        # used for traversing the go ontology
-        go_ont = load_ontology()
-        
-        # create json required for visualizations for each protein sequence GO term predictions
-        visualizations_json_data = []
-        for i, terms in enumerate(all_terms):
-            nodes, links = create_d3_network_json_for_terms(terms, go_ont)
-            scatter = create_d3_scatter_json_for_terms(terms_and_score_predictions_to_render[i])
-            visualizations_json_data.append({"nodes": json.dumps(nodes),
-                                             "links": json.dumps(links),
-                                             "scatter": json.dumps(scatter)})
+        visualizations_json_data = create_visualization_data(all_terms_predicted,
+                                                             terms_and_score_predictions_to_render,
+                                                             go_ontology)
 
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id,
                                                           "status": status,
                                                           "results": zip(results["entries"],
                                                                          results["sequences"],
-                                                                         list(map(lambda x: enumerate(x.items()), terms_and_score_predictions_to_render)),
+                                                                         list(map(
+                                                                             lambda x: enumerate(x.items()),
+                                                                              terms_and_score_predictions_to_render)),
                                                                          results["namespaces"],
                                                                          visualizations_json_data),
                                                           "isComplete": True})
+    elif status.upper() == STATE_ERROR:
+        return {"Error": "Job does not exist"}
     else:
         return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "isComplete": False})
 
