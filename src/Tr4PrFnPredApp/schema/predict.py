@@ -23,6 +23,7 @@ class PredictResponse(BaseModel):
 
 class PredictJobResponse(BaseModel):
     model: Optional[str]
-    job_id: Union[int, str]
+    job_id: Optional[Union[int, str]]
     status: str = "PENDING"
     result: Optional[Dict]
+    error: Optional[str]

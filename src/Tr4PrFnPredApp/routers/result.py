@@ -74,7 +74,7 @@ def create_visualization_data(all_terms_predicted, terms_and_score_predictions_t
     return visualizations_json_data
 
 
-def get_job_status(job_id):
+async def get_job_status(job_id):
 
     cached_job_status = get_cached_status(job_id)
 

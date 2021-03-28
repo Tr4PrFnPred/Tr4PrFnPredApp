@@ -23,6 +23,34 @@ function switchTabs(e, tab) {
 }
 
 
+function showInvalidInput(input, message) {
+
+    // set invalid text
+    let invalidSequenceMessage = document.getElementById("sequences-invalid");
+    invalidSequenceMessage.style.display = "block";
+    invalidSequenceMessage.innerHTML = message;
+
+    // set invalid textarea form
+    input.className = "form-control is-invalid";
+}
+
+function displayLoadingIcon() {
+
+    document.getElementById("loading-icon").style.display = "inline-block";
+}
+
+function hideLoadingIcon() {
+
+    document.getElementById("loading-icon").style.display = "none";
+}
+
+function toggleSubmitButton() {
+
+    document.getElementById("submit-button").disabled =
+        !document.getElementById("submit-button").disabled;
+}
+
+
 function submitSequence(e) {
 
     let input = document.getElementById("sequences-input");
@@ -31,13 +59,14 @@ function submitSequence(e) {
     let sequences_input = input.value;
     let model = model_select.value;
 
+    displayLoadingIcon();
+    toggleSubmitButton();
+
     if (!sequences_input && file_input.files.length === 0) {
 
-        // set invalid text
-        document.getElementById("sequences-invalid").style.display = "block";
-
-        // set invalid textarea form
-        input.className = "form-control is-invalid";
+        showInvalidInput(input, "Must not be empty");
+        hideLoadingIcon();
+        toggleSubmitButton();
     } else {
 
         document.getElementById("sequences-invalid").style.display = "none";
@@ -55,7 +84,15 @@ function submitSequence(e) {
                 body: new FormData(form)
             }).then((resp) => {
                 return resp.json();
-            }).then(redirectToResultPage)
+            }).then(function(data) {
+                if (data.error) {
+                    showInvalidInput(input, data.error);
+                    hideLoadingIcon();
+                    toggleSubmitButton();
+                } else {
+                    redirectToResultPage(data);
+                }
+            })
         } else {
 
             let body = {
@@ -74,11 +111,15 @@ function submitSequence(e) {
                 body: JSON.stringify(body)
             }).then(function (response) {
                 return response.json();
-            }).then(redirectToResultPage);
-
-            // display loading icon and disable submit button to prevent multiple requests
-            document.getElementById("submit-button").disabled = true;
-            document.getElementById("loading-icon").style.display = "inline-block";
+            }).then(function(data) {
+                if (data.error) {
+                    showInvalidInput(input, data.error);
+                    hideLoadingIcon();
+                    toggleSubmitButton();
+                } else {
+                    redirectToResultPage(data);
+                }
+            });
         }
     }
 }
