@@ -1,0 +1,11 @@
+name: Tr4PrFnPredApp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - aiofiles==0.6.0
+  - fastapi==0.62.0
+  - uvicorn==0.12.3
+  - tensorflow
+  - requests
+  - pandas
