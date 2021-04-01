@@ -17,6 +17,7 @@ from Tr4PrFnPredLib.utils.ontology import load_ontology
 from ..schema.predict import PredictJobResponse
 from ..common.constants import STATE_COMPLETE, STATE_ERROR
 from ..common.storage import get_job_status as get_cached_status
+from ..common.storage import get_is_local
 from ..utils.visualizations import create_d3_network_json_for_terms, create_d3_scatter_json_for_terms
 
 import logging
@@ -90,6 +91,7 @@ async def get_job_status(job_id):
 async def render_result_page(request: Request, job_id: Union[int, str]):
 
     status = get_job_status(job_id)
+    local_job = get_is_local(job_id)
 
     logger.info(f'Status {status}')
 
@@ -97,7 +99,10 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 
         go_ontology = load_ontology()
 
-        results = await fetch_results(job_id)
+        if local_job:
+            results = await fetch_results_local(job_id)
+        else:
+            results = await fetch_results(job_id)
 
         terms_and_score_predictions_to_render = get_terms_and_score_predictions_render(results['terms'])
 
@@ -122,22 +127,40 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
     elif status.upper() == STATE_ERROR:
         return {"Error": "Job does not exist"}
     else:
-        return templates.TemplateResponse("result.html", {"request": request, "job_id": job_id, "isComplete": False})
+        return templates.TemplateResponse("result.html", {"request": request,
+                                                          "job_id": job_id,
+                                                          "isComplete": False,
+                                                          "local": local_job})
 
 
 @router.get("/{job_id}")
 async def get_results(job_id: Union[str, int]):
 
-    status = await check_job_status(job_id)
-    logger.info(f'Get Results: Status: {status}')
+    if get_is_local(job_id):
+        status = get_job_status(job_id)
 
-    response = PredictJobResponse(job_id=job_id, status=status)
+        if status.upper() == STATE_COMPLETE:
 
-    if status.upper() == STATE_COMPLETE:
-        # save this status so the next request to this page does not have to recheck the status of job
-        cache_job_id(job_id, STATE_COMPLETE)
+    else:
+        status = await check_job_status(job_id)
+        logger.info(f'Get Results: Status: {status}')
+
+        response = PredictJobResponse(job_id=job_id, status=status)
+
+        if status.upper() == STATE_COMPLETE:
+            # save this status so the next request to this page does not have to recheck the status of job
+            cache_job_id(job_id, STATE_COMPLETE)
 
     return response
+
+
+async def fetch_results(job_id, folder="./results"):
+
+    result_file_path = f'{folder}/{job_id}'
+
+    async with aiofiles.open(result_file_path, "r") as f:
+        await f.read()
+
 
 
 class CustomEncoder(json.JSONEncoder):

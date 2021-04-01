@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 from ..schema.predict import PostPredict, PredictJobResponse
 from ..common.fasta import CheckEmpty, CheckInvalidCharacters, CheckTags
+from ..utils.submit import submit_job
 
 from Tr4PrFnPredLib.jobs.submit import submit_and_get_job_id
 from fastapi import File, UploadFile, Form
 
+import uuid
 import logging
 logger = logging.getLogger(__file__)
 
@@ -63,16 +65,26 @@ async def predict_protein_function(json: PostPredict):
 
     if is_fasta_input(sequences):
         logger.info("Validated FASTA sequence")
-        entry_dict = _parse_fasta_input(sequences)
 
-        job_id = await submit_and_get_job_id(model_type, entry_dict)
-
-        res = PredictJobResponse(model=model_type, job_id=job_id, terms=[])
+        res = submit_job(model_type, sequences)
 
         return res
     else:
         logger.warning("Invalid FASTA format")
         return PredictJobResponse(model=model_type, error="Invalid FASTA format")
+
+
+async def submit_job(model_type, sequences) -> PredictJobResponse:
+    entry_dict = _parse_fasta_input(sequences)
+
+    if len(entry_dict.keys()) < 10:
+        job_id = submit_job(model_type, entry_dict)
+    else:
+        job_id = await submit_and_get_job_id(model_type, entry_dict)
+
+
+
+    return PredictJobResponse(model=model_type, job_id=job_id, terms=[])
 
 
 @router.post("/file", response_model=PredictJobResponse)
