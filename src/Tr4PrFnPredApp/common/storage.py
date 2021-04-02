@@ -15,3 +15,19 @@ def get_job_status(job_id: str, host="localhost", port=6379) -> str:
         job_status = values[0].decode("utf-8")
 
     return job_status
+
+
+def set_local_job(job_id: str, host="localhost", port=6379):
+
+    r = redis.Redis(host=host, port=port)
+
+    r.hmset(job_id, {"local": True})
+
+
+def get_is_local(job_id: str, host="localhost", port=6379) -> bool:
+
+    r = redis.Redis(host=host, port=port)
+
+    is_local = r.hmget(job_id, "local")
+
+    return is_local or False
