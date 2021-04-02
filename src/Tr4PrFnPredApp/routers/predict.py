@@ -6,7 +6,6 @@ from ..utils.submit import submit_local_job
 from Tr4PrFnPredLib.jobs.submit import submit_and_get_job_id
 from fastapi import File, UploadFile, Form
 
-import uuid
 import logging
 logger = logging.getLogger(__file__)
 
