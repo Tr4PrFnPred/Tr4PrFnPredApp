@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from ..schema.predict import PostPredict, PredictJobResponse
 from ..common.fasta import CheckEmpty, CheckInvalidCharacters, CheckTags
-from ..utils.submit import submit_job
+from ..utils.submit import submit_local_job
 
 from Tr4PrFnPredLib.jobs.submit import submit_and_get_job_id
 from fastapi import File, UploadFile, Form
@@ -78,11 +78,9 @@ async def submit_job(model_type, sequences) -> PredictJobResponse:
     entry_dict = _parse_fasta_input(sequences)
 
     if len(entry_dict.keys()) < 10:
-        job_id = submit_job(model_type, entry_dict)
+        job_id = submit_local_job(model_type, entry_dict)
     else:
         job_id = await submit_and_get_job_id(model_type, entry_dict)
-
-
 
     return PredictJobResponse(model=model_type, job_id=job_id, terms=[])
 

@@ -136,31 +136,26 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 @router.get("/{job_id}")
 async def get_results(job_id: Union[str, int]):
 
-    if get_is_local(job_id):
-        status = get_job_status(job_id)
+    status = await check_job_status(job_id)
+    logger.info(f'Get Results: Status: {status}')
 
-        if status.upper() == STATE_COMPLETE:
+    response = PredictJobResponse(job_id=job_id, status=status)
 
-    else:
-        status = await check_job_status(job_id)
-        logger.info(f'Get Results: Status: {status}')
-
-        response = PredictJobResponse(job_id=job_id, status=status)
-
-        if status.upper() == STATE_COMPLETE:
-            # save this status so the next request to this page does not have to recheck the status of job
-            cache_job_id(job_id, STATE_COMPLETE)
+    if status.upper() == STATE_COMPLETE:
+        # save this status so the next request to this page does not have to recheck the status of job
+        cache_job_id(job_id, STATE_COMPLETE)
 
     return response
 
 
-async def fetch_results(job_id, folder="./results"):
+async def fetch_results_local(job_id, folder="./results"):
 
     result_file_path = f'{folder}/{job_id}'
 
     async with aiofiles.open(result_file_path, "r") as f:
-        await f.read()
+        content = await f.read()
 
+    return json.loads(content)
 
 
 class CustomEncoder(json.JSONEncoder):

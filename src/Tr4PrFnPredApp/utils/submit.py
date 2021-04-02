@@ -6,6 +6,7 @@ from Tr4PrFnPredLib.common.constants import STATUS_PENDING, STATUS_RUNNING, STAT
 
 from ..common.storage import set_local_job
 
+import asyncio
 import uuid
 
 
@@ -23,7 +24,7 @@ def create_namespace_list_from_terms(term_collections: list, go_ont) -> list:
     return namespace_list
 
 
-def submit_local_job():
+def submit_local_job(model_type, entry_dict):
 
     # create unique job id
     job_id = str(uuid.uuid4())
@@ -31,10 +32,12 @@ def submit_local_job():
     cache_job_id(job_id, STATUS_PENDING, -1)
     set_local_job(job_id)
 
+    asyncio.create_task(run_prediction_job(model_type, entry_dict, job_id))
+
     return job_id
 
 
-def run_prediction_job(model, entry_dict, job_id, folder="./results"):
+async def run_prediction_job(model, entry_dict, job_id, folder="./results"):
 
     cache_job_id(job_id, STATUS_RUNNING)
 
