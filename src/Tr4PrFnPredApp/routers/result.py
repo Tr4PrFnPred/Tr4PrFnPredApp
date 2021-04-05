@@ -20,6 +20,8 @@ from ..common.storage import get_job_status as get_cached_status
 from ..common.storage import get_is_local
 from ..utils.visualizations import create_d3_network_json_for_terms, create_d3_scatter_json_for_terms
 
+import pickle
+
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__file__)
@@ -75,11 +77,13 @@ def create_visualization_data(all_terms_predicted, terms_and_score_predictions_t
     return visualizations_json_data
 
 
-async def get_job_status(job_id):
+async def get_job_status(job_id, local_job):
 
     cached_job_status = get_cached_status(job_id)
 
-    if cached_job_status.upper() == STATE_COMPLETE:
+    if local_job:
+        return cached_job_status
+    elif cached_job_status.upper() == STATE_COMPLETE:
         return STATE_COMPLETE
     elif cached_job_status == STATE_ERROR:
         return STATE_ERROR
@@ -90,8 +94,8 @@ async def get_job_status(job_id):
 @router.get("/page/{job_id}")
 async def render_result_page(request: Request, job_id: Union[int, str]):
 
-    status = get_job_status(job_id)
     local_job = get_is_local(job_id)
+    status = await get_job_status(job_id, local_job)
 
     logger.info(f'Status {status}')
 
@@ -136,8 +140,13 @@ async def render_result_page(request: Request, job_id: Union[int, str]):
 @router.get("/{job_id}")
 async def get_results(job_id: Union[str, int]):
 
-    status = await check_job_status(job_id)
-    logger.info(f'Get Results: Status: {status}')
+    local_job = get_is_local(job_id)
+
+    if local_job:
+        status = get_cached_status(job_id)
+    else:
+        status = await check_job_status(job_id)
+        logger.info(f'Get Results: Status: {status}')
 
     response = PredictJobResponse(job_id=job_id, status=status)
 
@@ -152,10 +161,10 @@ async def fetch_results_local(job_id, folder="./results"):
 
     result_file_path = f'{folder}/{job_id}'
 
-    async with aiofiles.open(result_file_path, "r") as f:
-        content = await f.read()
+    async with aiofiles.open(result_file_path, mode="rb") as f:
+        results = await f.read()
 
-    return json.loads(content)
+    return pickle.loads(results)
 
 
 class CustomEncoder(json.JSONEncoder):
@@ -185,7 +194,8 @@ async def remove_file_after_download(path: str):
 @router.get("/download/{job_id}")
 async def download_results(job_id: Union[str, int], background_tasks: BackgroundTasks):
 
-    cached_job_status = get_job_status(job_id)
+    local_job = get_is_local(job_id)
+    cached_job_status = get_job_status(job_id, local_job)
 
     if cached_job_status.upper() == STATE_COMPLETE:
 

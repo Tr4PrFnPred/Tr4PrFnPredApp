@@ -21,7 +21,7 @@ def set_local_job(job_id: str, host="localhost", port=6379):
 
     r = redis.Redis(host=host, port=port)
 
-    r.hmset(job_id, {"local": True})
+    r.hmset(job_id, {"local": 'True'})
 
 
 def get_is_local(job_id: str, host="localhost", port=6379) -> bool:

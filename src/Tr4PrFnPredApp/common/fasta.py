@@ -1,4 +1,3 @@
-
 class FastaRule():
 
     @staticmethod
@@ -10,7 +9,8 @@ class CheckEmpty(FastaRule):
 
     @staticmethod
     def check_rule(fasta: str) -> bool:
-        return not fasta
+        # 'not str' will evaluate to True if empty and False 	
+        return not (not fasta)
 
 
 class CheckTags(FastaRule):
@@ -32,7 +32,9 @@ class CheckInvalidCharacters(FastaRule):
     def check_rule(self, fasta: str) -> bool:
         sequences = self.get_sequences(fasta)
         for sequence in sequences:
+            if not sequence:
+                # if empty
+                continue			
             if not sequence.isalpha():
                 return False
         return True
-

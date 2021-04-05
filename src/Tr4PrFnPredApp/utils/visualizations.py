@@ -42,7 +42,11 @@ def create_d3_network_json_for_terms(terms, go_ont):
                 q.append(go)
 
             if current not in go_set:
-                go_dict = {'id': current, 'group': go_ont.get_namespace(current)}
+                try:
+                    namespace = go_ont.get_namespace(current)
+                except:
+                    namespace = "Unknown"
+                go_dict = {'id': current, 'group': namespace}
                 nodes.append(go_dict)
                 go_set.add(current)
 
