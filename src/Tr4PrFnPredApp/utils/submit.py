@@ -6,7 +6,9 @@ from Tr4PrFnPredLib.common.constants import STATUS_PENDING, STATUS_RUNNING, STAT
 
 from ..common.storage import set_local_job
 
-import asyncio
+from multiprocessing import Process
+import pathlib
+import os
 import uuid
 
 
@@ -17,8 +19,10 @@ def create_namespace_list_from_terms(term_collections: list, go_ont) -> list:
         terms = term_collection.keys()
 
         for term in list(terms):
-            namespace_collection[term] = go_ont.get_namespace(term)
-
+            try:
+                namespace_collection[term] = go_ont.get_namespace(term)
+            except:
+                continue
         namespace_list.append(namespace_collection)
 
     return namespace_list
@@ -32,14 +36,18 @@ def submit_local_job(model_type, entry_dict):
     cache_job_id(job_id, STATUS_PENDING, -1)
     set_local_job(job_id)
 
-    asyncio.create_task(run_prediction_job(model_type, entry_dict, job_id))
+    p = Process(target=run_prediction_job, args=(model_type, entry_dict, job_id))
+    p.start()
 
     return job_id
 
 
-async def run_prediction_job(model, entry_dict, job_id, folder="./results"):
+def run_prediction_job(model, entry_dict, job_id, folder="./results"):
 
     cache_job_id(job_id, STATUS_RUNNING)
+
+    if not pathlib.Path(folder).exists():
+        os.makedirs(folder)
 
     results_file = f'{folder}/{job_id}'
 
