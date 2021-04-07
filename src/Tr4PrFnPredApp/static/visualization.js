@@ -29,6 +29,8 @@ function generate_network_graph(event) {
 
 let scatter_plot_render = function(data, entry) {
 
+    const entryName = entry.replace("/\s/g,", "");
+
     const trace1 = {
         x: Array.from({length: data.length}, (_, i) => i + 1),
         y: data.map(term => term.value),
@@ -49,26 +51,31 @@ let scatter_plot_render = function(data, entry) {
           title:'One Versus All Graph'
     };
 
-    Plotly.newPlot(`${entry}-vis-scatter`, [trace1], layout);
+    Plotly.newPlot(`${entryName}-vis-scatter`, [trace1], layout);
 };
 
 
 let network_graph_render = function(graph, entry) {
 
     const width = 900;
-    const height = 640;
+    const height = 720;
+
+    const entryName = entry.replace("/\s/g,", "");
 
     const color = d3.scaleOrdinal(d3.schemeCategory20);
 
     const simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(100))
-        .force('charge', d3.forceManyBody().strength(-300))
+        .force('charge', d3.forceManyBody().strength(-50))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    const svg = d3.select(`#${entry}-vis-graph`)
+    const svg = d3.select(`#${entryName}-vis-graph`)
                     .append("svg")
                     .attr("width", width)
-                    .attr("height", height);
+                    .attr("height", height)
+                    .call(d3.zoom().on("zoom", function () {
+                       svg.attr("transform", d3.event.transform)
+                    })).append("g");
 
     const link = svg.append("g")
                     .attr("class", "links")

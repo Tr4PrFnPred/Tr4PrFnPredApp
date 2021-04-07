@@ -45,7 +45,7 @@ def _parse_fasta_input(fasta: str) -> dict:
     for entry in entries:
         if entry == "":
             continue
-        entry = entry.replace("\r", "")
+        entry = entry.replace("\r", "").replace(" ", "")
 
         entry_split_by_newline = entry.split("\n")
 
