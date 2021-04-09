@@ -195,14 +195,17 @@ async def remove_file_after_download(path: str):
 async def download_results(job_id: Union[str, int], background_tasks: BackgroundTasks):
 
     local_job = get_is_local(job_id)
-    cached_job_status = get_job_status(job_id, local_job)
+    cached_job_status = await get_job_status(job_id, local_job)
 
     if cached_job_status.upper() == STATE_COMPLETE:
 
-        results = await fetch_results(job_id)
-        response_file_path = f'{job_id}-temp.json'
+        response_file_path = get_results_file(job_id, local_job)
 
-        background_tasks.add_task(remove_file_after_download, response_file_path)
+        if local_job:
+            results = await download_results_local(job_id)
+        else:
+            results = await download_results_remote(job_id)
+            background_tasks.add_task(remove_file_after_download, response_file_path)
 
         # FIXME: Need to return a JSON here but consider just saving results as JSON in future and remove this code
         async with aiofiles.open(response_file_path, "w") as f:
@@ -211,3 +214,21 @@ async def download_results(job_id: Union[str, int], background_tasks: Background
         return FileResponse(response_file_path, media_type="application/octet-stream", filename=f'{job_id}.json')
     elif cached_job_status == STATE_ERROR:
         return {"Error": "Job does not exist"}
+
+
+def get_results_file(job_id: Union[str, int], local_job: bool, folder="./results"):
+
+    if local_job:
+        return f'{folder}/{job_id}'
+    else:
+        return f'{job_id}-temp.json'
+
+
+async def download_results_remote(job_id: Union[str, int]):
+
+    return await fetch_results(job_id)
+
+
+async def download_results_local(job_id: Union[str, int]):
+
+    return await fetch_results_local(job_id)
